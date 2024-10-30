@@ -6,11 +6,12 @@ pip install httpx beautifulsoup4
 '''
 
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
-BASE_URL_2 = '&ie=utf8&_sug_=y&_sug_type_=&w=01019900&sut=3025&sst0=1730299585404&lkt=0%2C0%2C0'
+#BASE_URL_2 = '&ie=utf8&_sug_=y&_sug_type_=&w=01019900&sut=3025&sst0=1730299585404&lkt=0%2C0%2C0'
 
 def get_html(url):
     with httpx.Client() as client:
-        response = client.get(url)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'}
+        response = client.get(url, headers=headers)
 
         if response.status_code != 200:
             print(f"Non-200 response: {url} - Status Code: {response.status_code}")
@@ -19,9 +20,9 @@ def get_html(url):
     
 def main():
 
-    query = '奥运会金牌'
+    query = '习近平'
 
-    html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
+    html = get_html(f'{BASE_URL_1}{query}')
 
     body = html.find('body')
     links_wrapper = body.find(id='wrapper')
@@ -29,15 +30,16 @@ def main():
     news_box = links_main.find('div', class_='news-box')
     news_list = news_box.find('ul')
     news_sites = news_list.find_all('li')
-    print(news_sites)
+    #print(news_sites)
 
     links = []
 
     for site in news_sites:
         link_box = site.find(class_='txt-box')
         link_tag = link_box.find('a', href=True)
-        link = link_tag.get('href')
+        link = "https://weixin.sogou.com" + link_tag.get('href')
         print(link)
+        links.append(link)
         link = ''
 
 
