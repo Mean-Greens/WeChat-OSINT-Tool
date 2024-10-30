@@ -1,4 +1,8 @@
+# This file contains a hardcoded cookie called SNUID which is required to bypass Sogou bot detection.
+# We will attempt automatic creation/retrieval of this cookie later.
+#
 import httpx
+import re
 from bs4 import BeautifulSoup
 
 '''
@@ -17,6 +21,57 @@ def get_html(url):
             print(f"Non-200 response: {url} - Status Code: {response.status_code}")
         
         return BeautifulSoup(response.text, 'html.parser')
+    
+def get_wechat_link(url):
+    with httpx.Client() as client:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0',
+            'Cookie': 'IPLOC=CN; SNUID=F69A556EEEE8C85C5B9B054DEEAEFDD4'
+                   }
+        
+        response = client.get(url, headers=headers)
+        if response.status_code == 302:
+            print(response.headers) 
+        elif response.status_code == 200:
+            # print(response.headers)
+            # print(response.text)
+            WCUrl = ""
+            pattern = r"url \+= '(.*?)';"
+            matches = re.findall(pattern, response.text)
+            for match in matches:
+                WCUrl += match
+
+            print(WCUrl)
+            return WCUrl   
+        else:
+            print(response.status_code)
+            print("Failed to retrieve the website")
+            return None
+        
+def read_website(url):
+    """
+    Reads and returns the body of the website at the given url.
+    Args:
+        url (str): The url of the website to read.
+    Returns:
+        str: The body of the website.
+        None: If the request fails.
+    """
+    with httpx.Client() as client:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0'}
+        
+        response = client.get(url, headers=headers)
+
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            body = soup.body
+            body_text = body.get_text(strip=True)
+            return body_text        
+        else:
+            print(response.status_code)
+            print("Failed to retrieve the website")
+            return None
+
     
 def main():
 
@@ -38,25 +93,14 @@ def main():
         link_box = site.find(class_='txt-box')
         link_tag = link_box.find('a', href=True)
         link = "https://weixin.sogou.com" + link_tag.get('href')
-        print(link)
+        #print(link)
         links.append(link)
         link = ''
+        
+    #print(read_website(get_wechat_link(links[0])))
+    get_wechat_link(links[0])
 
-
-    # get_page_data(links[0])
-
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-    #     futures = [executor.submit(process_region, f'https://onlinesys.necta.go.tz/results/2023/sfna/{link[1]}', link[0]) for link in region_links]
-    #     # futures = [executor.submit(process_region, f'https://onlinesys.necta.go.tz/results/2023/sfna/{link[1]}', link[0]) for link in region_links[:2]] # For testing only, limiting the number of loops
-    #     concurrent.futures.wait(futures)
-
-    # print('Finished collecting data')
 
 if __name__ == "__main__":
     main()
 
-
-
-
-# &amp;type=2&amp;query=%E5%A5%A5%E8%BF%90%E4%BC%9A%E9%87%91%E7%89%8C&amp;token=A46451CE988A9C26B4B296076721FFE3B484EDA56722588B
-# &type=2&query=%E5%A5%A5%E8%BF%90%E4%BC%9A%E9%87%91%E7%89%8C&token=A46451CE988A9C26B4B296076721FFE3B484EDA56722588B
