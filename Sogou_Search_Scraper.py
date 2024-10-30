@@ -97,8 +97,7 @@ def main():
         links.append(link)
         link = ''
         
-    #print(read_website(get_wechat_link(links[0])))
-    get_wechat_link(links[0])
+    print(read_website(get_wechat_link(links[0])))
 
 
 if __name__ == "__main__":
