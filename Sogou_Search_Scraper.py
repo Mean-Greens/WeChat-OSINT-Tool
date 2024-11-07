@@ -3,6 +3,7 @@
 #
 import httpx
 import re
+import time
 from bs4 import BeautifulSoup
 
 '''
@@ -32,6 +33,8 @@ def get_wechat_link(url):
         response = client.get(url, headers=headers)
         if response.status_code == 302:
             print(response.headers) 
+            print("You have been blocked")
+            exit()
         elif response.status_code == 200:
             # print(response.headers)
             # print(response.text)
@@ -72,6 +75,32 @@ def read_website(url):
             return None
 
     
+def sogou_searcher(query):
+
+    time.sleep(5)
+    html = get_html(f'{BASE_URL_1}{query}')
+
+    body = html.find('body')
+    links_wrapper = body.find(id='wrapper')
+    links_main = links_wrapper.find(id='main')
+    news_box = links_main.find('div', class_='news-box')
+    news_list = news_box.find('ul')
+    news_sites = news_list.find_all('li')
+    #print(news_sites)
+
+    links = []
+
+    for site in news_sites:
+        link_box = site.find(class_='txt-box')
+        link_tag = link_box.find('a', href=True)
+        link = "https://weixin.sogou.com" + link_tag.get('href')
+        links.append(get_wechat_link(link))
+        link = ''
+
+    return links
+        
+    #print(read_website(get_wechat_link(links[0])))
+
 def main():
 
     query = '习近平'
@@ -103,4 +132,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
