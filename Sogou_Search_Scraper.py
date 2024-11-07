@@ -41,7 +41,6 @@ def get_wechat_link(url):
             for match in matches:
                 WCUrl += match
 
-            print(WCUrl)
             return WCUrl   
         else:
             print(response.status_code)
@@ -93,11 +92,13 @@ def main():
         link_box = site.find(class_='txt-box')
         link_tag = link_box.find('a', href=True)
         link = "https://weixin.sogou.com" + link_tag.get('href')
-        #print(link)
-        links.append(link)
+        links.append(get_wechat_link(link))
         link = ''
+
+    for link in links:
+        print(link)
         
-    print(read_website(get_wechat_link(links[0])))
+    #print(read_website(get_wechat_link(links[0])))
 
 
 if __name__ == "__main__":
