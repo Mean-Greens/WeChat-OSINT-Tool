@@ -1,4 +1,4 @@
-# This file contains a hardcoded cookie called SNUID and SUV which is required to bypass Sogou bot detection.
+# This file contains a hardcoded cookies which are required to bypass Sogou bot detection.
 # We will attempt automatic creation/retrieval of this cookie later.
 #
 import httpx
@@ -9,17 +9,30 @@ from bs4 import BeautifulSoup
 '''
 pip install httpx beautifulsoup4
 '''
-
+HEADERS = {
+            'Host': 'weixin.sogou.com',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'DNT': '1',
+            'Sec-GPC': '1',
+            'Connection': 'keep-alive',
+            'Cookie': 'ABTEST=0|1731083541|v1; SNUID=F49F576CEBEDCD85A76017EBECE1B107; SUID=1874BB801953A20B00000000672E3D15; IPLOC=US; SUID=1874BB8026A6A20B00000000672E3D16',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Priority': 'u=0, i'
+                   }
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
-#BASE_URL_2 = '&ie=utf8&_sug_=y&_sug_type_=&w=01019900&sut=3025&sst0=1730299585404&lkt=0%2C0%2C0'
+BASE_URL_2 = '&ie=utf8'
 
 def get_html(url):
     with httpx.Client() as client:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0',
-            'Cookie': 'IPLOC=US; SNUID=E9854971F1F7D7AAA7CC2158F25F211E; cuid=AAF8FCm+TwAAAAuipm0bXgEAvgU=; SUV=1730998380594875'
-                   }
-        response = client.get(url, headers=headers)
+        
+        response = client.get(url, headers=HEADERS)
 
         if response.status_code != 200:
             print(f"Non-200 response: {url} - Status Code: {response.status_code}")
@@ -28,12 +41,11 @@ def get_html(url):
     
 def get_wechat_link(url):
     with httpx.Client() as client:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0',
-            'Cookie': 'IPLOC=US; SNUID=E9854971F1F7D7AAA7CC2158F25F211E; cuid=AAF8FCm+TwAAAAuipm0bXgEAvgU=; SUV=1730998380594875'
-                   }
+        # headers = {
+        #     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
+        #            }
         
-        response = client.get(url, headers=headers)
+        response = client.get(url, headers=HEADERS)
         if response.status_code == 302:
             print(response.headers) 
             print("You have been blocked")
@@ -83,7 +95,7 @@ def sogou_searcher(query):
     links = []
     print(query)
     time.sleep(5)
-    html = get_html(f'{BASE_URL_1}{query}')
+    html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
 
     try:
         body = html.find('body')
@@ -110,9 +122,9 @@ def sogou_searcher(query):
 
 def main():
 
-    query = '神隱特偵組'
+    query = '神隐特警队+漫画+或+电视剧'
 
-    html = get_html(f'{BASE_URL_1}{query}')
+    html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
 
     body = html.find('body')
     links_wrapper = body.find(id='wrapper')
