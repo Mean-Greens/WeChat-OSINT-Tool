@@ -1,4 +1,4 @@
-# This file contains a hardcoded cookie called SNUID which is required to bypass Sogou bot detection.
+# This file contains a hardcoded cookie called SNUID and SUV which is required to bypass Sogou bot detection.
 # We will attempt automatic creation/retrieval of this cookie later.
 #
 import httpx
@@ -15,7 +15,10 @@ BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # quer
 
 def get_html(url):
     with httpx.Client() as client:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0',
+            'Cookie': 'IPLOC=US; SNUID=E9854971F1F7D7AAA7CC2158F25F211E; cuid=AAF8FCm+TwAAAAuipm0bXgEAvgU=; SUV=1730998380594875'
+                   }
         response = client.get(url, headers=headers)
 
         if response.status_code != 200:
@@ -27,7 +30,7 @@ def get_wechat_link(url):
     with httpx.Client() as client:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0',
-            'Cookie': 'IPLOC=CN; SNUID=F69A556EEEE8C85C5B9B054DEEAEFDD4'
+            'Cookie': 'IPLOC=US; SNUID=E9854971F1F7D7AAA7CC2158F25F211E; cuid=AAF8FCm+TwAAAAuipm0bXgEAvgU=; SUV=1730998380594875'
                    }
         
         response = client.get(url, headers=headers)
@@ -77,19 +80,23 @@ def read_website(url):
     
 def sogou_searcher(query):
 
+    links = []
+    print(query)
     time.sleep(5)
     html = get_html(f'{BASE_URL_1}{query}')
 
-    body = html.find('body')
-    links_wrapper = body.find(id='wrapper')
-    links_main = links_wrapper.find(id='main')
-    news_box = links_main.find('div', class_='news-box')
-    news_list = news_box.find('ul')
-    news_sites = news_list.find_all('li')
-    #print(news_sites)
-
-    links = []
-
+    try:
+        body = html.find('body')
+        links_wrapper = body.find(id='wrapper')
+        links_main = links_wrapper.find(id='main')
+        news_box = links_main.find('div', class_='news-box')
+        news_list = news_box.find('ul')
+        news_sites = news_list.find_all('li')
+        #print(news_sites)
+    except:
+        print("No search results were returned")
+        return links
+    
     for site in news_sites:
         link_box = site.find(class_='txt-box')
         link_tag = link_box.find('a', href=True)
@@ -103,7 +110,7 @@ def sogou_searcher(query):
 
 def main():
 
-    query = '习近平'
+    query = '神隱特偵組'
 
     html = get_html(f'{BASE_URL_1}{query}')
 

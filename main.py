@@ -1,25 +1,91 @@
+# Example Conversation Output:
+
+# User: Who are you?
+# AI: I am a helpful chat assistant.
+
+# User: Great. Can you find me a website that I can use to practice web scraping?
+
+# AI: Based on information from the internet, one such website is https://www.scrapethissite.com/pages/. 
+# This website provides various examples of pages for practicing web scraping, including country lists, hockey team stats, Oscar-winning films, and more. These examples cover different types of interfaces, such as forms, searching, pagination, AJAX, JavaScript, frames, and iFrames, making it a great resource to practice your web scraping skills.    
+
+# User: Thanks!
+# AI: You're welcome!
+
+
+# This is an example chat session through the terminal
+# The AI will use the internet if it is required, otherwise, it will use its own knowledge base
 from Sogou_Search_Scraper import *
 from llm_axe import *
+from llm_axe import make_prompt, AgentType, OllamaChat, OnlineAgent, FunctionCaller, Agent
+
+def internet():
+    """Choose if the internet is required or if we don't have information about the topic"""
+    return ""
+
+def no_internet():
+    """Choose if the internet is not required"""
+    return ""
+
+prompt = '''
+        You are an AI assistant.
+        Determine whether or not the internet is required to answer the user's prompt.
+        If the internet is not required, answer "no internet required".
+        If the internet is required, answer "internet required".
+
+        Internet is required if you don't have information about the topic and the user's prompt is talking about something SPECIFIC that we need solid FACTS for.
+        Internet is not required if you believe that the internet is not required to correctly answer the user's question.
+
+        Do not respond with anything else.
+'''
+
+response_prompt = '''
+        You are an AI assistant that specializes in gathering Chinese open source intelligence.
+        Reply in English with the most accurate information available, and cite your sources for each claim you make.
+'''
 
 def main():
-    # Example showing how to use an online agent
-    # The online agent will use the internet to try and best answer the user prompt
-    prompt = "跟我说说中国国家主席吧"
+    print('''
+        ******************************************************************
+        Welcome to the online chat demo. 
+        If the AI is unable to answer your question, it will use the internet to answer.
+        Otherwise, it will answer using its own knowledge base.
+        Type 'exit' to exit.
+        ******************************************************************''')
+
     llm = OllamaChat(model="gemma2:2b")
-    # searcher = OnlineAgent(llm)
-    # resp = searcher.search(prompt)
-    # print(resp)
+    online_agent = OnlineAgent(llm, custom_searcher=sogou_searcher)
+    plan_agent = Agent(llm, custom_system_prompt=prompt)
+    normal_agent = Agent(llm, agent_type=AgentType.GENERIC_RESPONDER, custom_system_prompt=response_prompt)
+    function_caller = FunctionCaller(llm, functions=[internet, no_internet])
 
+    chat_history = []
+    user_input = ""
+
+    while True:
+        print("User: ", end="")
+        user_input = input()
+        if user_input == "exit":
+            exit()
+
+        chat_history.append(make_prompt("user", user_input))
+
+        # First determine if the internet is required or not
+        plan = plan_agent.ask("USERS INPUT: " + user_input)
+        
+        function_name = "no_internet"
+        func_resp = function_caller.get_function(plan) 
+        if func_resp is not None:
+            function_name = func_resp["function"].__name__
+
+        resp = ""
+        if function_name == "internet":
+            resp = online_agent.search(user_input)
+        else:
+            resp = normal_agent.ask(user_input, history=chat_history)
+
+        print("\nAI: " + resp + "\n")
+        chat_history.append(make_prompt("assistant", resp))
     
-    # You may provide the OnlineAgent with a custom searcher
-    # The searcher must take in a search query and return a list of string URLS
-    # example hard coded searcher:
-    searcher = OnlineAgent(llm, custom_searcher=sogou_searcher)
-    resp = searcher.search(prompt)
-    print(resp)
 
-
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
