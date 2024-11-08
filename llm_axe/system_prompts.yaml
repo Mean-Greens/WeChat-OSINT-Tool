@@ -110,7 +110,7 @@ OnlineSearcher:
         {{
             "search_query": "your search query"
         }}
-        - Your must only provide ONE search query
+        - You must only provide ONE search query
         - You must provide the BEST search query for the given information
         - The search query must be as concise as possible
         - The search query must be in Simplified Chinese

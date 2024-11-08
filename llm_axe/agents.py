@@ -535,6 +535,8 @@ class OnlineAgent:
             return None
 
         search_results = self.search_function(query)
+        if not search_results: #added by Steven
+            return None
         search_results =  json.dumps(search_results)
 
         url_picker_prompts = []
