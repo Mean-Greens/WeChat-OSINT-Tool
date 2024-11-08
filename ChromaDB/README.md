@@ -5,6 +5,7 @@
 4. create folder db
 
 ## Read full text of documents
-1. `cd db`
-2. `sqlite3 chroma.sqlite3`
-3. `select * from embedding_fulltext_search;`
+1. Follow this documentation (Windows only): https://stackoverflow.com/questions/7330565/how-to-install-sqlite-on-windows
+2. `cd db`
+3. `sqlite3 chroma.sqlite3`
+4. `select * from embedding_fulltext_search;`
