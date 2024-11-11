@@ -48,5 +48,7 @@ results = collection.query(
   n_results=1
 )
 data = results['documents'][0][0]
+ 
+# Add some code to send data to the LLM we chose to parse data with. 
 
 print(data)
