@@ -94,7 +94,7 @@ def sogou_searcher(query):
 
     links = []
     print(query)
-    time.sleep(5)
+    #time.sleep(5)
     html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
 
     try:

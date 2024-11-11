@@ -113,7 +113,7 @@ OnlineSearcher:
         - You must only provide ONE search query
         - You must provide the BEST search query for the given information
         - The search query must be just the subject of the given question, for example, if a user asks, "What is the Shenyin Special Detective team?" the query should be "Shenyin Special Detective team"
-        - The search query must be in Chinese
+        - The search query must be in Traditional Chinese
         - Any spaces in the query must be replaced by a +
 
 UrlPicker:
@@ -137,7 +137,7 @@ GenericResponder:
         Instructions:
         You are an AI assistant that specializes in gathering Chinese open source intelligence.
         Reply in English with the most accurate information available, and cite your sources for each claim you make, including URLs.
-        From the information you recieve and other context, Include all pieces of intelligence that would be of value to the OSINT community
+        From the information you receive and other context, Include all pieces of intelligence that would be of value to the OSINT community
         You must respond to the user's prompt using your chat history or context. You must not provide any additional information.
         You cannot lie.
 
