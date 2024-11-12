@@ -1,3 +1,15 @@
+'''
+To avoid getting blocked save the cookies:
+
+# Save storage state into the file.
+storage = context.storage_state(path="state.json")
+
+Then create a new context in playwright with those cookies:
+
+# Create a new context with the saved storage state.
+context = browser.new_context(storage_state="state.json")
+'''
+
 # This file contains a hardcoded cookie called SNUID and SUV which is required to bypass Sogou bot detection.
 # We will attempt automatic creation/retrieval of this cookie later.
 #
