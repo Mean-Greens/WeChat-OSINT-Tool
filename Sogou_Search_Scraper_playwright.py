@@ -1,6 +1,3 @@
-#------------------------------------------------------------------------------------------------------ This Scraper sometimes gets IP blocked ------------------------------------------------------------------------------------------------------#
-# This file contains a hardcoded cookie called SNUID and SUV which is required to bypass Sogou bot detection.
-# We will attempt automatic creation/retrieval of this cookie later.
 #
 import re
 import time
@@ -83,10 +80,12 @@ def read_website(url):
     """
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless = False)
+        browser = pw.firefox.launch(headless = False)
         context = browser.new_context()
         page = context.new_page()
-        title, medadata_information, main_article
+        title = ''
+        medadata_information = ''
+        main_article = ''
 
         # If the list scraper breaks, the try catch block will restart it
         try:
@@ -144,12 +143,12 @@ def sogou(page, query):
     return links
 
 
-def sogou_searcher(query):
+def main(query):
     query_links = []
 
     # Create new playwright instance
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless = False)
+        browser = pw.firefox.launch(headless = False)
         context = browser.new_context()
         page = context.new_page()
 
@@ -164,7 +163,7 @@ def sogou_searcher(query):
         context.close()
         browser.close()
 
-    title, medadata, article = read_website(query_links[0][0])
+    title, medadata, article = read_website(query_links[0][2])
 
     print(title)
     print(medadata)
@@ -172,4 +171,4 @@ def sogou_searcher(query):
 
 
 if __name__ == "__main__":    
-    sogou_searcher(QUERY)
+    main(QUERY)
