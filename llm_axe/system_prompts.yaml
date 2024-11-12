@@ -112,7 +112,7 @@ OnlineSearcher:
         }}
         - You must only provide ONE search query
         - You must provide the BEST search query for the given information
-        - The search query must be just the subject of the given question, for example, if a user asks, "What is the Shenyin Special Detective team?" the query should be "Shenyin Special Detective team"
+        - The search query must be just the subject of the given question or statement, for example, if a user asks, "What is the Shenyin Special Detective team?" the query should be "Shenyin Special Detective team"
         - The search query must be in Traditional Chinese
         - Any spaces in the query must be replaced by a +
 

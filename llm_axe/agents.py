@@ -538,6 +538,7 @@ class OnlineAgent:
         if not search_results: #added by Steven
             return None
         search_results =  json.dumps(search_results)
+        print(search_results)#added by Steven
 
         url_picker_prompts = []
         if history is not None:
@@ -562,6 +563,7 @@ class OnlineAgent:
             warnings.warn("LLM did not respond with valid url or json response.")
             return None
             
+        print(url)#added by steven
         website_text = self.site_reader_function(url)
         user_prompt = f'''
                     Please read the following information:
@@ -573,6 +575,8 @@ class OnlineAgent:
                     {prompt}
 
                     Start your answer with "Based on information from the internet, "
+
+                    Include the url of the website in your answer as a source
                     '''
         
         final_responder = Agent(llm=self.llm, agent_type=AgentType.GENERIC_RESPONDER)

@@ -15,6 +15,7 @@ import time
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import re
+from Sogou_Search_Scraper import *
 
 
 class AgentType(Enum):
@@ -169,6 +170,21 @@ def internet_search(query):
         query (str): The query to search for.
     """
     urls = list(search(query, tld="co.in", num=5, stop=10, pause=2))
+    urls_detailed = []
+
+    for url in urls:
+        urls_detailed.append(fetch_url_info(url))
+
+    return urls_detailed
+
+def sogou_search(query):
+    """
+    Searches the internet for a query.
+    Returns top 5 results.
+    Args:
+        query (str): The query to search for.
+    """
+    urls = list(sogou_searcher(query))
     urls_detailed = []
 
     for url in urls:

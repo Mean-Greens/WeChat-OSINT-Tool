@@ -9,3 +9,5 @@ requests
 selenium
 numpy
 scikit-learn
+httpx
+beautifulsoup4
