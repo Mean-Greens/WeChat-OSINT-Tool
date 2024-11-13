@@ -14,6 +14,7 @@ context = browser.new_context(storage_state="state.json")
 # We will attempt automatic creation/retrieval of this cookie later.
 #
 import json
+import os
 import re
 import time
 from bs4 import BeautifulSoup
@@ -168,7 +169,7 @@ def main(query):
     # Create new playwright instance
     with sync_playwright() as pw:
         browser = pw.firefox.launch(headless = False)
-        context = browser.new_context(storage_state="state.json")
+        context = browser.new_context(storage_state=f"{os.path.dirname(os.path.abspath(__file__))}\\state.json")
         page = context.new_page()
 
         # If the list scraper breaks, the try catch block will restart it
