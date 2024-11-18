@@ -53,7 +53,7 @@ def main():
         ******************************************************************''')
 
     llm = OllamaChat(model="gemma2:2b")
-    online_agent = OnlineAgent(llm, custom_searcher=sogou_search)
+    online_agent = OnlineAgent(llm, custom_searcher=sogou_searcher)
     plan_agent = Agent(llm, custom_system_prompt=prompt)
     normal_agent = Agent(llm, agent_type=AgentType.GENERIC_RESPONDER, custom_system_prompt=response_prompt)
     function_caller = FunctionCaller(llm, functions=[internet, no_internet])

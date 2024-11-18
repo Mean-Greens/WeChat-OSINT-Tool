@@ -289,9 +289,12 @@ def fetch_url_info(url):
         response = requests.get(url, headers=headers,timeout=5)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
-            title = soup.find('title').text if soup.find('title') else 'No title found'
-            meta_desc = soup.find('meta', attrs={'name': 'description'})
+            meta_title = soup.find('meta', attrs={'property': 'og:title'})
+            meta_desc = soup.find('meta', attrs={'property': 'og:description'})
+            title = meta_title['content'] if meta_title else 'No title found'
             description = meta_desc['content'] if meta_desc else 'No description found'
+            print(title)
+            print(description)
             return {"url": url, 'title': title, 'description': description}
         else:
             return None

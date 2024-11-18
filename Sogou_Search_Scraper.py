@@ -18,7 +18,7 @@ HEADERS = {
             'DNT': '1',
             'Sec-GPC': '1',
             'Connection': 'keep-alive',
-            'Cookie': 'ABTEST=0|1731083541|v1; SNUID=F49F576CEBEDCD85A76017EBECE1B107; SUID=1874BB801953A20B00000000672E3D15; IPLOC=US; SUID=1874BB8026A6A20B00000000672E3D16',
+            'Cookie': 'ABTEST=0|1731534140|v1; SNUID=4B2DE1D95A5F7C8B6C389B795A602AC5; SUID=1274BB807452A20B0000000067351D3C; ariaDefaultTheme=undefined',
             'Upgrade-Insecure-Requests': '1',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
@@ -94,7 +94,6 @@ def sogou_searcher(query):
 
     links = []
     print(query)
-    #time.sleep(5)
     html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
 
     try:
