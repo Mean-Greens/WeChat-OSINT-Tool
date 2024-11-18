@@ -17,6 +17,8 @@ while True:
 
     messages.append(HumanMessage(content=user_input))
     response = chat_model.invoke(messages)
-response = chat_model.invoke(messages)
-print(f"{response.content}")
-print("Hello, world")
+    print(f"Assistant: {response.content}")
+    
+#response = chat_model.invoke(messages)
+#print(f"{response.content}")
+#print("Hello, world")
