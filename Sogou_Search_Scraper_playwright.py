@@ -1,4 +1,20 @@
+'''
+To avoid getting blocked save the cookies:
+
+# Save storage state into the file.
+storage = context.storage_state(path="state.json")
+
+Then create a new context in playwright with those cookies:
+
+# Create a new context with the saved storage state.
+context = browser.new_context(storage_state="state.json")
+'''
+
+# This file contains a hardcoded cookie called SNUID and SUV which is required to bypass Sogou bot detection.
+# We will attempt automatic creation/retrieval of this cookie later.
 #
+import json
+import os
 import re
 import time
 from bs4 import BeautifulSoup
@@ -30,6 +46,10 @@ HEADERS =  {
 
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
 QUERY = '神隱特偵組'
+
+def print_request_headers(request):
+    for header, value in request.headers.items():
+        print(f"{header}: {value}")
 
 def get_html(url):
     with httpx.Client() as client:
@@ -149,7 +169,7 @@ def main(query):
     # Create new playwright instance
     with sync_playwright() as pw:
         browser = pw.firefox.launch(headless = False)
-        context = browser.new_context()
+        context = browser.new_context(storage_state=f"{os.path.dirname(os.path.abspath(__file__))}\\state.json")
         page = context.new_page()
 
         # If the list scraper breaks, the try catch block will restart it
