@@ -5,7 +5,7 @@ import chromadb
 pip install ollama chromadb
 '''
 
-client = chromadb.PersistentClient(path='c:/Users/capstone/Desktop/db')
+client = chromadb.PersistentClient(path='./db')
 
 collection = client.get_or_create_collection(name="test")
 
@@ -36,7 +36,7 @@ if collection.count() == 0:
 # print()
 
 # an example prompt
-prompt = "What animals are llamas related to?"
+prompt = "How long do llamas live?"
 
 # generate an embedding for the prompt and retrieve the most relevant doc
 response = ollama.embeddings(
@@ -48,7 +48,9 @@ results = collection.query(
   n_results=1
 )
 data = results['documents'][0][0]
+other = results['metadatas']
  
 # Add some code to send data to the LLM we chose to parse data with. 
 
 print(data)
+print(other)
