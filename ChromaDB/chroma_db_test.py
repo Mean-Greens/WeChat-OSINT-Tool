@@ -1,3 +1,4 @@
+import os
 import ollama
 import chromadb
 
@@ -5,7 +6,13 @@ import chromadb
 pip install ollama chromadb
 '''
 
-client = chromadb.PersistentClient(path='./db')
+# Get the directory path of the current file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Add the 'db' folder to the directory path
+db_path = os.path.join(current_dir, 'db')
+
+client = chromadb.PersistentClient(path=db_path)
 
 collection = client.get_or_create_collection(name="test")
 
@@ -47,10 +54,8 @@ results = collection.query(
   query_embeddings=[response["embedding"]],
   n_results=1
 )
-data = results['documents'][0][0]
-other = results['metadatas']
+data = results['documents']
  
 # Add some code to send data to the LLM we chose to parse data with. 
 
 print(data)
-print(other)
