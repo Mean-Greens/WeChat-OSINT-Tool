@@ -1,3 +1,4 @@
+# For this project you need Python >= 3.13 and Microsoft Visual C++ 14.0 or greater is required. Get it with "Microsoft C++ Build Tools": https://visualstudio.microsoft.com/visual-cpp-build-tools/
 aiofiles==24.1.0
 aiohappyeyeballs==2.4.4
 aiohttp==3.11.9
