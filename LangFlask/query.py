@@ -6,7 +6,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from get_vector_db import get_vector_db
 
-LLM_MODEL = os.getenv('LLM_MODEL', 'mistral')
+LLM_MODEL = os.getenv('LLM_MODEL', 'gemma2:2b')
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
