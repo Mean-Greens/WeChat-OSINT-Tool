@@ -1,6 +1,7 @@
 # This file contains a hardcoded cookies which are required to bypass Sogou bot detection.
 # We will attempt automatic creation/retrieval of this cookie later.
 #
+import datetime
 import httpx
 import re
 import time
@@ -63,6 +64,12 @@ def timer(func):
         print(elapsed_time)
         return result
     return wrapper
+
+def timeConvert(unix_timestamp): 
+    # Convert the Unix timestamp to a datetime object 
+    dt = datetime.datetime.fromtimestamp(int(unix_timestamp)) 
+    # Format the datetime object as a string 
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 def get_html(url):
     with httpx.Client() as client:
@@ -139,6 +146,17 @@ def sogou_searcher(query):
     
     for site in news_sites:
         link_box = site.find(class_='txt-box')
+        title = link_box.find('h3').text.strip()
+        description = link_box.find('p', class_='txt-info').text.strip()
+        data = link_box.find('div', class_='s-p')
+        author = data.find('span', class_='all-time-y2').text.strip()
+        date = data.find('span', class_='s2').find('script').text.strip()
+
+        pattern = r'document.write\(timeConvert\(\'(\d+)\'\)\)'
+        match = re.match(pattern, date)
+        if match:
+            date = match.group(1)
+
         link_tag = link_box.find('a', href=True)
         link = "https://weixin.sogou.com" + link_tag.get('href')
         links.append(get_wechat_link(link))
