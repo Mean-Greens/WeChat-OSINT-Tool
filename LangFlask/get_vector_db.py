@@ -1,6 +1,8 @@
 import os
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_community.vectorstores.chroma import Chroma
+from langchain_ollama import OllamaEmbeddings
+# This is the older version of Chroma to be deprecated, but the only one to work with numpy > 2.0.0 currently
+from langchain_community.vectorstores import Chroma
+# from langchain_chroma import Chroma
 
 CHROMA_PATH = os.getenv('CHROMA_PATH', './chroma')
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'LangFlask')
