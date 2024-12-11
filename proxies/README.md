@@ -1,2 +1,3 @@
-# List of proxies can be found here
-https://github.com/TheSpeedX/PROXY-List?tab=readme-ov-file
+# Proxies scraped from
+1. spys.me
+2. free-proxies-list.net
