@@ -45,6 +45,13 @@ def query(input):
             llm,
             prompt=QUERY_PROMPT
         )
+        
+        output = db.as_retriever(search_kwargs={'k': 1})
+        #output = db.similarity_search_by_vector(k=1)
+        #docs = output.get_relevant_documents(input)
+        docs = output.invoke(input)
+        print(docs[0].metadata)
+        quit()
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output
         chain = (

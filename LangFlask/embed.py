@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
-from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_community.document_loaders import BSHTMLLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter

@@ -5,3 +5,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+str = input("Enter a query or quit to exit: \n")
+while str != "quit":
+    response = query(str)
+    print(response)
+    str = input("Enter a query or quit to exit: \n")
