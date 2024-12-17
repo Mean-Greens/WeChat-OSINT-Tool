@@ -34,7 +34,8 @@ BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # quer
 BASE_URL_2 = '&ie=utf8'
 
 QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
-SEARCH_TERM = '香蕉布丁' # Banana pudding
+SEARCH_TERM_OLD = '香蕉布丁' # Banana pudding
+SEARCH_TERM = '冰淇淋' # Ice cream
 
 # Get the directory path of the current file
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -163,19 +164,33 @@ def sogou_searcher(query):
         link = ''
 
     for link in links:
-        documents.append([link, read_website(link)])
+        website = read_website(link)
+        web_hash = hash(website)
+        documents.append([link, website, title, description, author, date, web_hash])
 
     return documents
 
 def store_websites(documents:list):
     # store each document in a vector embedding database
     for i, d in enumerate(documents):
+        # Check the hash to see if it is already in the database
+        hash_value = d[6]
+        articles_by_hash = query_articles_by_hash(hash_value)
+        
+        if articles_by_hash['documents'] == [[]]:
+            continue
+
         response = ollama.embeddings(model="mxbai-embed-large", prompt=d[1])
         embedding = response["embedding"]
         collection.add(
             ids=[str(i)],
             embeddings=[embedding],
-            metadatas=[{"source": f'{d[0]}'}],
+            metadatas=[{"url": f'{d[0]}',
+                        "title": f'{d[2]}',
+                        "description": f'{d[3]}',
+                        "author": f'{d[4]}',
+                        "date": f'{d[5]}',
+                        "hash": f'{d[6]}'}],
             documents=[d[1]]
         )
 
@@ -186,20 +201,51 @@ def get_articles(question:str):
     prompt=question
     )
     results = collection.query(
-    query_embeddings=[response["embedding"]],
-    n_results=3
+        query_embeddings=[response["embedding"]],
+        n_results=3
     )
     return results['documents']
 
+def query_articles_by_hash(hash_value):
+    # generate an embedding for the prompt and retrieve the most relevant doc
+    response = ollama.embeddings(
+    model="mxbai-embed-large",
+    prompt="This prompt does not matter"
+    )
+
+    # Define the filter 
+    filter_by_hash = {"hash": hash_value} 
+    
+    # Query the collection, ensuring to include 'documents' and 'metadatas'
+    results = collection.query(
+        query_embeddings=[response["embedding"]],
+        where=filter_by_hash,
+        # include=['documents', 'metadatas'] # Specify which fields to include in the response
+    )
+    return results
+
 @timer
 def main():
+    print(collection.count())
+    print()
     documents = sogou_searcher(SEARCH_TERM)
     store_websites(documents)
+    print()
+    print(collection.count())
+    print()
 
-    question = QUESTION
-    results = get_articles(question)
+    time.sleep(300)
 
-    print(results)
+    print(collection.count())
+    print()
+    documents = sogou_searcher(SEARCH_TERM_OLD)
+    store_websites(documents)
+    print()
+    print(collection.count())
+    # question = QUESTION
+    # results = get_articles(question)
+
+    # print(results)
 
 if __name__ == "__main__":
     main()
