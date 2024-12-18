@@ -100,7 +100,7 @@ def get_wechat_link(url):
             return WCUrl   
         else:
             print(response.status_code)
-            print("Failed to retrieve the website")
+            print("Failed to retrieve the link")
             return None
         
 def read_website(url):
@@ -164,7 +164,11 @@ def sogou_searcher(query):
         link = ''
 
     for link in links:
+        if link == None:
+            continue
         website = read_website(link)
+        if website == None:
+            continue
         web_hash = hash(website)
         documents.append([link, website, title, description, author, date, web_hash])
 
@@ -177,7 +181,7 @@ def store_websites(documents:list):
         hash_value = d[6]
         articles_by_hash = query_articles_by_hash(hash_value)
         
-        if articles_by_hash['documents'] == [[]]:
+        if len(articles_by_hash['documents'][0]) != 0:
             continue
 
         response = ollama.embeddings(model="mxbai-embed-large", prompt=d[1])
