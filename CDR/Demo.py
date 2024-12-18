@@ -2,6 +2,7 @@
 # We will attempt automatic creation/retrieval of this cookie later.
 #
 import datetime
+import uuid
 import httpx
 import re
 import time
@@ -187,7 +188,7 @@ def store_websites(documents:list):
         response = ollama.embeddings(model="mxbai-embed-large", prompt=d[1])
         embedding = response["embedding"]
         collection.add(
-            ids=[str(i)],
+            ids=[f'{uuid.uuid5(uuid.NAMESPACE_URL, d[0])}'],
             embeddings=[embedding],
             metadatas=[{"url": f'{d[0]}',
                         "title": f'{d[2]}',
