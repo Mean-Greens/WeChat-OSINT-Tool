@@ -231,22 +231,14 @@ def query_articles_by_hash(hash_value):
 
 @timer
 def main():
-    print(collection.count())
-    print()
     documents = sogou_searcher(SEARCH_TERM)
     store_websites(documents)
-    print()
-    print(collection.count())
-    print()
 
     time.sleep(300)
 
-    print(collection.count())
-    print()
     documents = sogou_searcher(SEARCH_TERM_OLD)
     store_websites(documents)
-    print()
-    print(collection.count())
+    
     # question = QUESTION
     # results = get_articles(question)
 
