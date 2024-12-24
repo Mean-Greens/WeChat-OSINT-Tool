@@ -47,14 +47,14 @@ def check_proxy(proxy, file):
 def main():
     gather_proxy_list()
 
-    time.sleep(1)
+    # time.sleep(1)
 
-    proxies = open('proxies_list.txt').read().splitlines()
+    # proxies = open('proxies_list.txt').read().splitlines()
 
-    with open("working_proxies_list.txt", 'w') as file:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-            futures = [executor.submit(check_proxy, proxy, file) for proxy in proxies[:100]] 
-            concurrent.futures.wait(futures)
+    # with open("working_proxies_list.txt", 'w') as file:
+    #     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    #         futures = [executor.submit(check_proxy, proxy, file) for proxy in proxies[:100]] 
+    #         concurrent.futures.wait(futures)
 
 if __name__ == "__main__":
     main()
