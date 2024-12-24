@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import scrapy
 
 '''
-pip install httpx beautifulsoup4 ollama chromadb scrapy
+pip install httpx beautifulsoup4 ollama chromadb scrapy scrapy-rotating-proxies
 '''
 HEADERS = {
             'Host': 'weixin.sogou.com',

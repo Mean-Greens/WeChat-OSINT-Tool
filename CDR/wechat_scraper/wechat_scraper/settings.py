@@ -55,6 +55,17 @@ ROBOTSTXT_OBEY = False
 #    "wechat_scraper.middlewares.WechatScraperDownloaderMiddleware": 543,
 #}
 
+# These settings are used to rotate proxies
+DOWNLOADER_MIDDLEWARES = {
+    # ...
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 300,
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 310,
+    # ...
+}
+
+ROTATING_PROXY_LIST_PATH = 'proxies_list.txt'
+##############################################################################################################
+
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
