@@ -6,8 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-str = input("Enter a query or quit to exit: \n")
+str = input("Enter a query, 1 to upload file, or quit to exit: \n")
 while str != "quit":
-    response = query(str)
-    print(response)
+    if str == "1":
+        file_path = input("Enter a file path: \n")
+        embed(file_path)
+    else:
+        response = query(str)
+        print(response)
+ 
     str = input("Enter a query or quit to exit: \n")

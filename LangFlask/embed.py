@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from langchain_community.document_loaders import BSHTMLLoader
+from MGHTMLLoader import MGHTMLLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from get_vector_db import get_vector_db
@@ -26,11 +27,11 @@ def save_file(file):
 # Function to load and split the data from the PDF file
 def load_and_split_file(file_path):
     # Load the PDF file and split the data into chunks
-    #loader = UnstructuredPDFLoader(file_path=file_path)
-    loader = BSHTMLLoader(file_path=file_path)
+    #loader = BSHTMLLoader(file_path=file_path)
+    loader = MGHTMLLoader(file_path=file_path, open_encoding="utf-8", title="urmom", author="urmom2", description="urmom3", time_stamp="urmoom")
     data = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    chunks = text_splitter.split_documents(data)
+    #text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    chunks = data
 
     return chunks
 
@@ -45,16 +46,16 @@ def load_and_split_dir(file_path):
     return chunks
 
 # Main function to handle the embedding process
-def embed(file):
+def embed(file_path):
     # Check if the file is valid, save it, load and split the data, add to the database, and remove the temporary file
-    if file.filename != '' and file and allowed_file(file.filename):
-        file_path = save_file(file)
-        chunks = load_and_split_file(file_path)
-        db = get_vector_db()
-        db.add_documents(chunks)
-        db.persist()
-        os.remove(file_path)
+    #if file.filename != '' and file and allowed_file(file.filename):
+        #file_path = save_file(file)
+    chunks = load_and_split_file(file_path)
+    db = get_vector_db()
+    db.add_documents(chunks)
+    db.persist()
+    #os.remove(file_path)
 
-        return True
+    return True
 
-    return False
+    #return False

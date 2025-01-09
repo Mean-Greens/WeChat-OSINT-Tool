@@ -1,5 +1,5 @@
 import os
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -51,6 +51,8 @@ def query(input):
         #docs = output.get_relevant_documents(input)
         docs = output.invoke(input)
         print(docs[0].metadata)
+        print(docs[0].id)
+        print(docs[0].page_content)
         quit()
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output
