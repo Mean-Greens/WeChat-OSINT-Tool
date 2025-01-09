@@ -58,7 +58,8 @@ def get_wechat_link(url):
         
         response = client.get(url, headers=HEADERS)
         if response.status_code == 302:
-            print(response.headers) 
+            print(response.headers)
+            print(url)
             print("You have been blocked")
             exit()
         elif response.status_code == 200:
