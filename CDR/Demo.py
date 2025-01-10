@@ -238,13 +238,8 @@ def query_articles_by_hash(hash_value):
     return results
 
 @timer
-def main():
-    documents = sogou_searcher(SEARCH_TERM)
-    store_websites(documents)
-
-    time.sleep(300)
-
-    documents = sogou_searcher(SEARCH_TERM_OLD)
+def main(search_term):
+    documents = sogou_searcher(search_term)
     store_websites(documents)
     
     # question = QUESTION
@@ -254,4 +249,7 @@ def main():
 
 if __name__ == "__main__":
     # main()
-    print(read_search_terms())
+    queries = read_search_terms()
+    for query in queries:
+        main(query)
+        time.sleep(300) # Sleep for 5 minutes to avoid being blocked
