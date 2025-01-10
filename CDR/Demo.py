@@ -67,6 +67,14 @@ def timer(func):
         return result
     return wrapper
 
+def read_search_terms():
+    with open('Wordlist.txt', 'r', encoding='utf-8') as f:
+        search_terms = f.readlines()
+        for i, term in enumerate(search_terms):
+            search_terms[i] = term.strip()
+        search_terms = list(set(list(filter(None, search_terms))))
+    return search_terms
+
 def timeConvert(unix_timestamp): 
     # Convert the Unix timestamp to a datetime object 
     dt = datetime.datetime.fromtimestamp(int(unix_timestamp)) 
@@ -245,4 +253,5 @@ def main():
     # print(results)
 
 if __name__ == "__main__":
-    main()
+    # main()
+    print(read_search_terms())
