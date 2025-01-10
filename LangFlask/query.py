@@ -46,13 +46,26 @@ def query(input):
             prompt=QUERY_PROMPT
         )
         
-        output = db.as_retriever(search_kwargs={'k': 1})
-        #output = db.similarity_search_by_vector(k=1)
-        #docs = output.get_relevant_documents(input)
-        docs = output.invoke(input)
-        print(docs[0].metadata)
-        print(docs[0].id)
-        print(docs[0].page_content)
+        # output = db.as_retriever(search_kwargs={'k': 1})
+        # #output = db.similarity_search_by_vector(k=1)
+        # #docs = output.get_relevant_documents(input)
+        # docs = output.invoke(input)
+        # print(docs[0].metadata)
+        # print(docs[0].id)
+        # print(docs[0].page_content)
+        # quit()
+
+        all_documents = db._collection.get(include=["metadatas", "documents"])
+
+        # Print hash and page content for each document
+        for metadata, page_content in zip(all_documents["metadatas"], all_documents["documents"]):
+            hash_value = metadata.get("hash", "No hash found")
+            title = metadata.get("title", "NO title")
+            print(f"Hash: {hash_value}")
+            print(f"Title: {title}")
+            print(f"Page Content: {page_content}")
+            print("-" * 50)  # Separator for readability
+
         quit()
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output

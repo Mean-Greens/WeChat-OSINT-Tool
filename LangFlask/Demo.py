@@ -5,6 +5,7 @@ import datetime
 import httpx
 import re
 import time
+import unicodedata
 from bs4 import BeautifulSoup
 import os
 import ollama
@@ -14,42 +15,48 @@ from typing import Dict, Iterator, Union
 from langchain_core.documents import Document
 from get_vector_db import get_vector_db
 from query import query
+import hashlib
 
 '''
 pip install httpx beautifulsoup4 ollama chromadb
 '''
+
 HEADERS = {
             'Host': 'weixin.sogou.com',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
             'Accept-Encoding': 'gzip, deflate, br, zstd',
             'DNT': '1',
             'Sec-GPC': '1',
             'Connection': 'keep-alive',
-            'Cookie': 'ABTEST=0|1731534140|v1; SNUID=4B2DE1D95A5F7C8B6C389B795A602AC5; SUID=1274BB807452A20B0000000067351D3C; ariaDefaultTheme=undefined',
+            'Referer': 'https://weixin.sogou.com/',
+            'Cookie': 'SNUID=FE286BE87D7A5626C3AA75CD7DD2BBEF; SUID=1274BB807452A20B0000000067351D3C; SUID=183E28957CA5A20B000000006750B0DA; cuid=AAEUxdBJUAAAAAuipseedwEAvgU=; SUV=1733341404042076; ABTEST=0|1736522904|v1; ariaDefaultTheme=undefined',
             'Upgrade-Insecure-Requests': '1',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-Site': 'same-site',
             'Sec-Fetch-User': '?1',
             'Priority': 'u=0, i'
-                   }
+        }
+
+
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
 BASE_URL_2 = '&ie=utf8'
 
 QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
 SEARCH_TERM = '香蕉布丁' # Banana pudding
 
+
 # Get the directory path of the current file
-current_dir = os.path.dirname(os.path.abspath(__file__))
+#current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Add the 'db' folder to the directory path
-db_path = os.path.join(current_dir, 'db')
+#db_path = os.path.join(current_dir, 'db')
 
-client = chromadb.PersistentClient(path=db_path)
+#client = chromadb.PersistentClient(path=db_path)
 
-collection = client.get_or_create_collection(name="demo")
+#collection = client.get_or_create_collection(name="demo")
 
 # Timer decorator
 def timer(func):
@@ -125,7 +132,9 @@ def read_website(url):
             soup = BeautifulSoup(response.text, 'html.parser')
             body = soup.body
             body_text = body.get_text(strip=True)
-            return body_text        
+            normalized_text = unicodedata.normalize("NFKD", body_text)
+            normalized_text = ' '.join(normalized_text.split())
+            return normalized_text
         else:
             print(response.status_code)
             print("Failed to retrieve the website")
@@ -133,7 +142,6 @@ def read_website(url):
    
 def sogou_searcher(query):
 
-    links = []
     documents = []
     print(query)
     html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
@@ -147,7 +155,7 @@ def sogou_searcher(query):
         news_sites = news_list.find_all('li')
     except:
         print("No search results were returned")
-        return links
+        return documents
     
     for site in news_sites:
         link_box = site.find(class_='txt-box')
@@ -164,20 +172,24 @@ def sogou_searcher(query):
 
         link_tag = link_box.find('a', href=True)
         link = "https://weixin.sogou.com" + link_tag.get('href')
-        links.append(get_wechat_link(link))
-        link = ''
 
-    for link in links:
-        text = read_website(link)
+        link = get_wechat_link(link)
+        if link == None:
+            continue
+        website = read_website(link)
+        if website == None:
+            continue
+        web_hash = hashlib.sha256(website.encode('utf-8')).hexdigest()
         metadata: Dict[str, Union[str, None]] = {
             "source": link,
             "title": title,
             "description": description,
             "author": author,
-            "date": date
+            "date": date,
+            "hash": web_hash
         }
-        doc = Document(page_content=text, metadata=metadata)
-
+        doc = Document(page_content=website, metadata=metadata)
+        
         documents.append(doc)
 
     return documents
@@ -185,20 +197,36 @@ def sogou_searcher(query):
 def store_websites(documents:list):
     # store each document in a vector embedding database
     db = get_vector_db()
+
     for doc in documents:
-        db.add_documents(doc)
-        db.persist()
+        
+        if document_exists_by_hash(db, doc.metadata.get("hash")):
+            print("Document already exists")
+        else:
+            print("Adding document to DB")
+            db.add_documents([doc])
+
+    #db.add_documents(documents)
+    #db.persist()
+
+def document_exists_by_hash(vectorstore, hash_value):
+    results = vectorstore.similarity_search_with_score(
+        query="",
+        k=1,
+        filter={"hash": hash_value}
+    )
+    return bool(results)
     
 
 @timer
 def main():
-    # documents = sogou_searcher(SEARCH_TERM)
-    # store_websites(documents)
+    documents = sogou_searcher('香蕉布丁')
+    store_websites(documents)
 
-    question = QUESTION
-    results = query(question)
+    # question = QUESTION
+    # results = query(SEARCH_TERM)
 
-    print(results)
+    # print(results)
 
 if __name__ == "__main__":
     main()
