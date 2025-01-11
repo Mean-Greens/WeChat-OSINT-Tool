@@ -77,6 +77,14 @@ def timer(func):
         return result
     return wrapper
 
+def read_search_terms():
+    with open('Wordlist.txt', 'r', encoding='utf-8') as f:
+        search_terms = f.readlines()
+        for i, term in enumerate(search_terms):
+            search_terms[i] = term.strip()
+        search_terms = list(set(list(filter(None, search_terms))))
+    return search_terms
+
 def timeConvert(unix_timestamp): 
     # Convert the Unix timestamp to a datetime object 
     dt = datetime.datetime.fromtimestamp(int(unix_timestamp)) 
@@ -219,8 +227,8 @@ def document_exists_by_hash(vectorstore, hash_value):
     
 
 @timer
-def main():
-    documents = sogou_searcher('香蕉布丁')
+def main(search_term):
+    documents = sogou_searcher(search_term)
     store_websites(documents)
 
     # question = QUESTION
@@ -229,4 +237,8 @@ def main():
     # print(results)
 
 if __name__ == "__main__":
-    main()
+    # main()
+    queries = read_search_terms()
+    for query in queries:
+        main(query)
+        time.sleep(300) # Sleep for 5 minutes to avoid being blocked
