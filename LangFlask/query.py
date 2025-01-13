@@ -6,7 +6,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from get_vector_db import get_vector_db
 
-LLM_MODEL = os.getenv('LLM_MODEL', 'gemma2:2b')
+LLM_MODEL = os.getenv('LLM_MODEL', 'aya:35b')
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
@@ -31,6 +31,7 @@ def get_prompt():
 
 # Main function to handle the query process
 def query(input):
+    print(input)
     if input:
         # Initialize the language model with the specified model name
         llm = ChatOllama(model=LLM_MODEL)
