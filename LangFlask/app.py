@@ -42,3 +42,5 @@ def route_query():
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
+
+# test = curl -X POST http://localhost:8080/query -H "Content-Type: application/json" -d '{"query": "what is the best kpop song?"}'
