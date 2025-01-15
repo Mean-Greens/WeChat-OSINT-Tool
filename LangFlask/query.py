@@ -25,13 +25,15 @@ def get_prompt():
     Question: {question}
     """
 
+    #Answer the question based ONLY on the following context:
+
     prompt = ChatPromptTemplate.from_template(template)
 
     return QUERY_PROMPT, prompt
 
 # Main function to handle the query process
 def query(input):
-    print(input)
+
     if input:
         # Initialize the language model with the specified model name
         llm = ChatOllama(model=LLM_MODEL)
@@ -56,18 +58,18 @@ def query(input):
         # print(docs[0].page_content)
         # quit()
 
-        all_documents = db._collection.get(include=["metadatas", "documents"])
+        # all_documents = db._collection.get(include=["metadatas", "documents"])
 
-        # Print hash and page content for each document
-        for metadata, page_content in zip(all_documents["metadatas"], all_documents["documents"]):
-            hash_value = metadata.get("hash", "No hash found")
-            title = metadata.get("title", "NO title")
-            print(f"Hash: {hash_value}")
-            print(f"Title: {title}")
-            print(f"Page Content: {page_content}")
-            print("-" * 50)  # Separator for readability
+        # # Print hash and page content for each document
+        # for metadata, page_content in zip(all_documents["metadatas"], all_documents["documents"]):
+        #     hash_value = metadata.get("hash", "No hash found")
+        #     title = metadata.get("title", "NO title")
+        #     print(f"Hash: {hash_value}")
+        #     print(f"Title: {title}")
+        #     print(f"Page Content: {page_content}")
+        #     print("-" * 50)  # Separator for readability
 
-        quit()
+        # quit()
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output
         chain = (

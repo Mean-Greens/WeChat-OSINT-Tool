@@ -16,6 +16,20 @@ from langchain_core.documents import Document
 from get_vector_db import get_vector_db
 from query import query
 import hashlib
+import random
+import logging
+from rich.traceback import install
+
+install(show_locals=True)
+
+log_file_path = os.path.join(os.path.dirname(__file__), 'Wechat_Scraper.log')
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.INFO,
+    encoding="utf-8",
+    format='{asctime} - {levelname} - {message}',
+    style="{"
+)
 
 '''
 pip install httpx beautifulsoup4 ollama chromadb
@@ -31,7 +45,7 @@ HEADERS = {
             'Sec-GPC': '1',
             'Connection': 'keep-alive',
             'Referer': 'https://weixin.sogou.com/',
-            'Cookie': 'SNUID=FE286BE87D7A5626C3AA75CD7DD2BBEF; SUID=1274BB807452A20B0000000067351D3C; SUID=183E28957CA5A20B000000006750B0DA; cuid=AAEUxdBJUAAAAAuipseedwEAvgU=; SUV=1733341404042076; ABTEST=0|1736522904|v1; ariaDefaultTheme=undefined',
+            'Cookie': 'IPLOC=NL; SUID=8CFD08D41AA7A20B000000006781FE67; cuid=AAHKs2cKUQAAAAuipsd9DwIA4wQ=; SUV=1736572520882172; ABTEST=0|1736572526|v1; SNUID=3F49BB67B4B59FD3FF27C4B3B4094BC1; ariaDefaultTheme=undefined',
             'Upgrade-Insecure-Requests': '1',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
@@ -74,6 +88,7 @@ def timer(func):
 
         elapsed_time = f"--- {int(hours)} hours, {int(minutes)} minutes, {seconds:.2f} seconds ---"
         print(elapsed_time)
+        logging.info(elapsed_time)
         return result
     return wrapper
 
@@ -91,13 +106,26 @@ def timeConvert(unix_timestamp):
     # Format the datetime object as a string 
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
-def get_html(url):
+def get_html(url, retries=5, wait_time=120):
     with httpx.Client() as client:
-        
-        response = client.get(url, headers=HEADERS)
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = client.get(url, headers=HEADERS, timeout=60.0)
+                response.raise_for_status() # Raise an exception for HTTP errors
+                break
+            except httpx.ReadTimeout:
+                print(f"ReadTimeout occured, retrying in {wait_time} seconds...")
+                logging.warning(f"ReadTimeout occured, retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+                attempt += 1
+        if attempt == retries:
+            logging.critical(f"failed to fetch the URL after {retries} attempts -- line 120")
+            raise Exception(f"failed to fetch the URL after {retries} attempts -- line 121")
 
         if response.status_code != 200:
             print(f"Non-200 response: {url} - Status Code: {response.status_code}")
+            logging.error(f"Non-200 response: {url} - Status Code: {response.status_code}")
         
         return BeautifulSoup(response.text, 'html.parser')
     
@@ -108,7 +136,9 @@ def get_wechat_link(url):
         if response.status_code == 302:
             print(response.headers) 
             print("You have been blocked")
-            exit()
+            logging.error(response.headers)
+            logging.error("You have been blocked")
+            return None
         elif response.status_code == 200:
             WCUrl = ""
             pattern = r"url \+= '(.*?)';"
@@ -120,9 +150,11 @@ def get_wechat_link(url):
         else:
             print(response.status_code)
             print("Failed to retrieve the website")
+            logging.error(response.status_code)
+            logging.error("Failed to retrieve the website")
             return None
         
-def read_website(url):
+def read_website(url, retries=5, wait_time=120):
     """
     Reads and returns the body of the website at the given url.
     Args:
@@ -133,8 +165,21 @@ def read_website(url):
     """
     with httpx.Client() as client:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0'}
-        
-        response = client.get(url, headers=headers)
+
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = client.get(url, headers=headers, timeout=60.0)
+                response.raise_for_status() # Raise an exception for HTTP errors
+                break
+            except httpx.ReadTimeout:
+                print(f"ReadTimeout occured, retrying in {wait_time} seconds...")
+                logging.warning(f"ReadTimeout occured, retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+                attempt += 1
+        if attempt == retries:
+            logging.critical(f"failed to fetch the URL after {retries} attempts -- line 178")
+            raise Exception(f"failed to fetch the URL after {retries} attempts -- line 179")
 
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -146,12 +191,15 @@ def read_website(url):
         else:
             print(response.status_code)
             print("Failed to retrieve the website")
+            logging.error(response.status_code)
+            logging.error("Failed to retrieve the website")
             return None
    
 def sogou_searcher(query):
 
     documents = []
     print(query)
+    logging.info(query)
     html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
 
     try:
@@ -163,6 +211,7 @@ def sogou_searcher(query):
         news_sites = news_list.find_all('li')
     except:
         print("No search results were returned")
+        logging.warning("No search results were returned")
         return documents
     
     for site in news_sites:
@@ -210,8 +259,10 @@ def store_websites(documents:list):
         
         if document_exists_by_hash(db, doc.metadata.get("hash")):
             print("Document already exists")
+            logging.info("Document already exists")
         else:
             print("Adding document to DB")
+            logging.info("Adding document to DB")
             db.add_documents([doc])
 
     #db.add_documents(documents)
@@ -236,9 +287,23 @@ def main(search_term):
 
     # print(results)
 
+def scrape():
+    while True:
+            queries = read_search_terms()
+            for query in queries:
+                main(query)
+                # Generate a random time between 4 and 6 minutes (in seconds)
+                random_sleep_time = random.uniform(15 * 60, 20 * 60)
+                # Sleep for the random time
+                time.sleep(random_sleep_time)
+                print(f"Slept for {random_sleep_time / 60:.2f} minutes.")
+                logging.info(f"Slept for {random_sleep_time / 60:.2f} minutes.")
+                
+                #time.sleep(300) # Sleep for 5 minutes to avoid being blocked
+
 if __name__ == "__main__":
     # main()
-    queries = read_search_terms()
-    for query in queries:
-        main(query)
-        time.sleep(300) # Sleep for 5 minutes to avoid being blocked
+    try:
+        scrape()
+    except httpx.ConnectError:
+        scrape()
