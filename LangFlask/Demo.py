@@ -13,7 +13,7 @@ import chromadb
 from MGHTMLLoader import MGHTMLLoader
 from typing import Dict, Iterator, Union
 from langchain_core.documents import Document
-from get_vector_db import get_vector_db
+from get_vector_db import get_vector_db, get_chunked_db
 from query import query
 import hashlib
 import random
@@ -97,7 +97,7 @@ def read_search_terms():
         search_terms = f.readlines()
         for i, term in enumerate(search_terms):
             search_terms[i] = term.strip()
-        search_terms = list(set(list(filter(None, search_terms))))
+        search_terms = set(list(filter(None, search_terms)))
     return search_terms
 
 def timeConvert(unix_timestamp): 
@@ -111,8 +111,8 @@ def get_html(url, retries=5, wait_time=120):
         attempt = 0
         while attempt < retries:
             try:
-                response = client.get(url, headers=HEADERS, timeout=60.0)
-                response.raise_for_status() # Raise an exception for HTTP errors
+                response = client.get(url, headers=HEADERS, follow_redirects=True, timeout=60.0)
+                # response.raise_for_status() # Raise an exception for HTTP errors
                 break
             except httpx.ReadTimeout:
                 print(f"ReadTimeout occured, retrying in {wait_time} seconds...")
@@ -169,8 +169,8 @@ def read_website(url, retries=5, wait_time=120):
         attempt = 0
         while attempt < retries:
             try:
-                response = client.get(url, headers=headers, timeout=60.0)
-                response.raise_for_status() # Raise an exception for HTTP errors
+                response = client.get(url, headers=headers, follow_redirects=True, timeout=60.0)
+                # response.raise_for_status() # Raise an exception for HTTP errors
                 break
             except httpx.ReadTimeout:
                 print(f"ReadTimeout occured, retrying in {wait_time} seconds...")
@@ -255,6 +255,9 @@ def store_websites(documents:list):
     # store each document in a vector embedding database
     db = get_vector_db()
 
+    # Chunk documents and store in a seperate collection that the LLM will use
+    db_chunked = get_chunked_db()
+
     for doc in documents:
         
         if document_exists_by_hash(db, doc.metadata.get("hash")):
@@ -264,6 +267,7 @@ def store_websites(documents:list):
             print("Adding document to DB")
             logging.info("Adding document to DB")
             db.add_documents([doc])
+            # db_chunked.load_and_split_file([doc])
 
     #db.add_documents(documents)
     #db.persist()
@@ -305,5 +309,8 @@ if __name__ == "__main__":
     # main()
     try:
         scrape()
-    except httpx.ConnectError:
+    except httpx.ConnectError as e1:
+        logging.error(e1)
         scrape()
+    except Exception as e:
+        logging.critical(e)
