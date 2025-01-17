@@ -19,6 +19,7 @@ import hashlib
 import random
 import logging
 from rich.traceback import install
+from pathlib import Path
 
 install(show_locals=True)
 
@@ -182,12 +183,14 @@ def read_website(url, retries=5, wait_time=120):
             raise Exception(f"failed to fetch the URL after {retries} attempts -- line 179")
 
         if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            body = soup.body
-            body_text = body.get_text(strip=True)
-            normalized_text = unicodedata.normalize("NFKD", body_text)
-            normalized_text = ' '.join(normalized_text.split())
-            return normalized_text
+            website = response.content
+
+            # soup = BeautifulSoup(response.text, 'html.parser')
+            # body = soup.body
+            # body_text = body.get_text(strip=True)
+            # normalized_text = unicodedata.normalize("NFKD", body_text)
+            # normalized_text = ' '.join(normalized_text.split())
+            return website
         else:
             print(response.status_code)
             print("Failed to retrieve the website")
@@ -236,7 +239,8 @@ def sogou_searcher(query):
         website = read_website(link)
         if website == None:
             continue
-        web_hash = hashlib.sha256(website.encode('utf-8')).hexdigest()
+        # web_hash = hashlib.sha256(website.encode('utf-8')).hexdigest()
+        web_hash = hashlib.sha256(website).hexdigest()
         metadata: Dict[str, Union[str, None]] = {
             "source": link,
             "title": title,
@@ -266,7 +270,13 @@ def store_websites(documents:list):
         else:
             print("Adding document to DB")
             logging.info("Adding document to DB")
-            db.add_documents([doc])
+
+            # Save space by only saving the metadata in the database and not the articles
+            db.add_documents([Document(page_content=' ', metadata=doc.metadata)])
+
+            # Save the HTML file to an Articles folder on the desktop
+            Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc.metadata.get("hash")}.html')).write_text(doc.page_content)
+
             # db_chunked.load_and_split_file([doc])
 
     #db.add_documents(documents)
