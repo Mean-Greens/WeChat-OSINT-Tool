@@ -185,12 +185,12 @@ def read_website(url, retries=5, wait_time=120):
         if response.status_code == 200:
             website = response.content
 
-            # soup = BeautifulSoup(response.text, 'html.parser')
-            # body = soup.body
-            # body_text = body.get_text(strip=True)
-            # normalized_text = unicodedata.normalize("NFKD", body_text)
-            # normalized_text = ' '.join(normalized_text.split())
-            return website
+            soup = BeautifulSoup(response.text, 'html.parser')
+            body = soup.body
+            body_text = body.get_text(strip=True)
+            normalized_text = unicodedata.normalize("NFKD", body_text)
+            normalized_text = ' '.join(normalized_text.split())
+            return normalized_text, website
         else:
             print(response.status_code)
             print("Failed to retrieve the website")
@@ -236,11 +236,11 @@ def sogou_searcher(query):
         link = get_wechat_link(link)
         if link == None:
             continue
-        website = read_website(link)
+        normalized_text, website = read_website(link)
         if website == None:
             continue
-        # web_hash = hashlib.sha256(website.encode('utf-8')).hexdigest()
-        web_hash = hashlib.sha256(website).hexdigest()
+        web_hash = hashlib.sha256(normalized_text.encode('utf-8')).hexdigest()
+        # web_hash = hashlib.sha256(normalized_text).hexdigest()
         metadata: Dict[str, Union[str, None]] = {
             "source": link,
             "title": title,
@@ -249,6 +249,7 @@ def sogou_searcher(query):
             "date": date,
             "hash": web_hash
         }
+
         doc = Document(page_content=website, metadata=metadata)
         
         documents.append(doc)
