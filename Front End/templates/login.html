@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<header>
+    <nav>
+        <div class="logo">
+            <img src="static/meangreens.png" id=logo alt="Mean Greens" />
+        </div>
+        <ul class="navbar">
+            <!--<img src="meangreens.png" id=logo alt="Mean Greens" />-->
+            <li class="has-dropdown">
+                <a href="/search">Search</a>
+                <ul>
+                    <li><a href="/results">Results</a></li>
+                </ul>
+            </li>
+            <li><a href="/doc">Documentation</a></li>
+            <li><a href="/wordlist">Wordlist</a></li> 
+            <li class="has-dropdown">
+                <a href="/login">Login</a>
+                <ul>
+                    <li><a href="/list">My Wordlists</a></li>
+                    <li><a href="/logout"><a>Logout</a></li>
+                </ul>
+            </li> 
+        </ul>
+    </nav>
+</header>
+<body>
+    <!-- Get Flask messages -->
+    {% include "macros/flask_messages.html" ignore missing with context %}
+
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <div class="search-container">
+        <form method="post" action="login">
+            <h3>Sign In</h3>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+            <input type="submit" id="loginbutton" value="Log In"><br>
+
+            <div class="register-forget">
+                <a href="/register">REGISTER</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
