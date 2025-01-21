@@ -6,7 +6,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from get_vector_db import get_vector_db
 
-LLM_MODEL = os.getenv('LLM_MODEL', 'aya:35b')
+LLM_MODEL = os.getenv('LLM_MODEL', 'aya-expanse:32b')
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
 def get_prompt():
@@ -14,13 +14,13 @@ def get_prompt():
         input_variables=["question"],
         template="""You are an AI language model assistant. Your task is to generate five
         different versions of the given user question to retrieve relevant documents from
-        a vector database. By generating multiple perspectives on the user question, your
+        a vector database of WeChat articles written in Chinese. By generating multiple perspectives on the user question, your
         goal is to help the user overcome some of the limitations of the distance-based
         similarity search. Provide these alternative questions separated by newlines.
         Original question: {question}""",
     )
 
-    template = """Answer the question based ONLY on the following context:
+    template = """You are an AI assistant that specializes in OSINT. Respond ONLY in English. Your task is to summarize the following WeChat articles and respond with the summary and an answer to the question below if possible:
     {context}
     Question: {question}
     """
@@ -49,14 +49,14 @@ def query(input):
             prompt=QUERY_PROMPT
         )
         
-        # output = db.as_retriever(search_kwargs={'k': 1})
-        # #output = db.similarity_search_by_vector(k=1)
-        # #docs = output.get_relevant_documents(input)
-        # docs = output.invoke(input)
-        # print(docs[0].metadata)
-        # print(docs[0].id)
-        # print(docs[0].page_content)
-        # quit()
+        output = db.as_retriever(search_kwargs={'k': 1})
+        #output = db.similarity_search_by_vector(k=1)
+        #docs = output.get_relevant_documents(input)
+        docs = output.invoke(input)
+        print(docs[0].metadata)
+        print(docs[0].id)
+        print(docs[0].page_content)
+        quit()
 
         # all_documents = db._collection.get(include=["metadatas", "documents"])
 
@@ -84,3 +84,19 @@ def query(input):
         return response
 
     return None
+
+# Main function to handle the query process
+def query_translation(input):
+
+    if input:
+        # Initialize the language model with the specified model name
+        llm = ChatOllama(model=LLM_MODEL)
+
+        response = llm.invoke(f"translate the following word or phrase for me. I would like this translated chinese (traditional). The word or phrase is '{input}'. please only return the translation and nothing else")
+        
+        return response.content
+
+    return None
+
+if __name__ == "__main__":
+    print(query_translation("test"))
