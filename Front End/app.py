@@ -1,8 +1,17 @@
 import os
-from flask import Flask, session, render_template, request, redirect, url_for, flash #CSRFProtect
+from flask import Flask, session, render_template, request, redirect, url_for, flash, jsonify #CSRFProtect
 from dotenv import load_dotenv
 import psycopg2
 import hashlib
+
+#These are importing functions from the "LangFlask" directory
+from LangFlask.embed import embed
+from LangFlask.query import query
+from LangFlask.get_vector_db import get_vector_db
+
+#Don't fully understand what this does, but its in the LangFlask app.py folder
+TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
+os.makedirs(TEMP_FOLDER, exist_ok=True)
 
 load_dotenv()
 
@@ -302,6 +311,56 @@ def hash_password(password, salt=None):
 #     url = url.split("/")[0]
 #     return render_template("idkyet.html", list=list, list_info=list_info, url=url) # Return the page to be rendered
 
+# ------------------------ ROUTES FOR SENDING CALLS TO THE BACKEND ------------------------ #
+@app.route('/embed', methods=['POST'])
+def route_embed():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    
+    embedded = embed(file)
+
+    if embedded:
+        return jsonify({"message": "File embedded successfully"}), 200
+
+    return jsonify({"error": "File embedded unsuccessfully"}), 400
+
+@app.route('/query', methods=['POST'])
+def route_query():
+    data = request.get_json()
+    response = query(data.get('query'))
+
+    if response:
+        return jsonify({"message": response}), 200
+
+    return jsonify({"error": "Something went wrong"}), 400
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=8080, debug=True)
+
+#This is a combined version of the /query (from Steven) and /search (From Taylor). I think it should work?
+@app.route("/search", methods=['GET', 'POST'])
+def search():
+    if request.method == "GET":
+        return render_template('search.html')
+    #once they search
+    elif request.method == "POST":
+        search_term = request.form['search_term']
+        response = query(search_term)
+
+        if response:
+            return jsonify({"message": response}), 200
+
+        return jsonify({"error": "Something went wrong"}), 400
+        #results = get_results(search_term)
+        #return render_template('results.html', results=results)
+        return render_template('results.html')
+
+# test = curl -X POST http://localhost:8080/query -H "Content-Type: application/json" -d '{"query": "what is the best kpop song?"}'
 
 # ------------------------ END ROUTES ------------------------ #
 
