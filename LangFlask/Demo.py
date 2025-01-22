@@ -15,6 +15,7 @@ from typing import Dict, Iterator, Union
 from langchain_core.documents import Document
 from get_vector_db import get_vector_db, get_chunked_db
 from query import query
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import hashlib
 import random
 import logging
@@ -250,7 +251,8 @@ def sogou_searcher(query):
             "hash": web_hash
         }
 
-        doc = Document(page_content=website, metadata=metadata)
+    
+        doc = [Document(page_content=website, metadata=metadata), Document(page_content = normalized_text, metadata=metadata)]
         
         documents.append(doc)
 
@@ -265,7 +267,7 @@ def store_websites(documents:list):
 
     for doc in documents:
         
-        if document_exists_by_hash(db, doc.metadata.get("hash")):
+        if document_exists_by_hash(db, doc[0].metadata.get("hash")):
             print("Document already exists")
             logging.info("Document already exists")
         else:
@@ -273,10 +275,15 @@ def store_websites(documents:list):
             logging.info("Adding document to DB")
 
             # Save space by only saving the metadata in the database and not the articles
-            db.add_documents([Document(page_content=' ', metadata=doc.metadata)])
+            db.add_documents([Document(page_content=' ', metadata=doc[0].metadata)])
+
+            chunk_doc = doc[1]
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+            chunks = text_splitter.split_documents([chunk_doc])
+            db_chunked.add_documents(chunks)
 
             # Save the HTML file to an Articles folder on the desktop
-            Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc.metadata.get("hash")}.html')).write_text(doc.page_content)
+            Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc[0].metadata.get("hash")}.html')).write_text(doc[0].page_content)
 
             # db_chunked.load_and_split_file([doc])
 
