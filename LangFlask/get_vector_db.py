@@ -4,7 +4,7 @@ from langchain_ollama import OllamaEmbeddings
 #from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
 
-CHROMA_PATH = os.getenv('CHROMA_PATH', './chroma')
+CHROMA_PATH = os.getenv('CHROMA_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'chroma'))
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'LangFlask')
 COLLECTION_NAME_CHUNKED = os.getenv('COLLECTION_CHUNKED_NAME', 'Chunked')
 TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'mxbai-embed-large')
