@@ -1,10 +1,15 @@
 import os
+import sys
 from langchain_ollama import ChatOllama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain.retrievers.multi_query import MultiQueryRetriever
-from get_vector_db import get_vector_db
+
+# Add parent directory to Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from get_vector_db import get_vector_db, get_chunked_db
 
 LLM_MODEL = os.getenv('LLM_MODEL', 'aya-expanse:32b')
 
@@ -12,15 +17,15 @@ LLM_MODEL = os.getenv('LLM_MODEL', 'aya-expanse:32b')
 def get_prompt():
     QUERY_PROMPT = PromptTemplate(
         input_variables=["question"],
-        template="""You are an AI language model assistant. Your task is to generate five
-        different versions of the given user question to retrieve relevant documents from
+        template="""You are an AI language model assistant. Your task is to tanslate the given user question below into Traditional Chinese and generate five
+        different versions of the given user question in Traditional Chinese to retrieve relevant documents from
         a vector database of WeChat articles written in Chinese. By generating multiple perspectives on the user question, your
         goal is to help the user overcome some of the limitations of the distance-based
         similarity search. Provide these alternative questions separated by newlines.
         Original question: {question}""",
     )
 
-    template = """You are an AI assistant that specializes in OSINT. Respond ONLY in English. Your task is to summarize the following WeChat articles and respond with the summary and an answer to the question below if possible:
+    template = """You are an AI assistant that specializes in OSINT. You must respond ONLY in English. You must list the hashes of the documents where you got your information. Your task is to answer to the question based ONLY on the following context and list the source hash values after:
     {context}
     Question: {question}
     """
@@ -38,7 +43,7 @@ def query(input):
         # Initialize the language model with the specified model name
         llm = ChatOllama(model=LLM_MODEL)
         # Get the vector database instance
-        db = get_vector_db()
+        db = get_chunked_db()
         # Get the prompt templates
         QUERY_PROMPT, prompt = get_prompt()
 
@@ -49,14 +54,16 @@ def query(input):
             prompt=QUERY_PROMPT
         )
         
-        output = db.as_retriever(search_kwargs={'k': 1})
-        #output = db.similarity_search_by_vector(k=1)
-        #docs = output.get_relevant_documents(input)
-        docs = output.invoke(input)
-        print(docs[0].metadata)
-        print(docs[0].id)
-        print(docs[0].page_content)
-        quit()
+        # output = db.as_retriever(search_kwargs={'k': 4})
+        # #output = db.similarity_search_by_vector(k=1)
+        # #docs = output.get_relevant_documents(input)
+        # docs = output.invoke(input)
+        # for doc in docs:
+        #     print(doc.metadata)
+        #     print(doc.id)
+        #     print(doc.page_content)
+
+        # quit()
 
         # all_documents = db._collection.get(include=["metadatas", "documents"])
 
@@ -92,7 +99,7 @@ def query_translation(input):
         # Initialize the language model with the specified model name
         llm = ChatOllama(model=LLM_MODEL)
 
-        response = llm.invoke(f"translate the following word or phrase for me. I would like this translated chinese (traditional). The word or phrase is '{input}'. please only return the translation and nothing else")
+        response = llm.invoke(f"translate the following word or phrase for me. I would like it translated to chinese (traditional). The word or phrase is '{input}'. please only return the translation and nothing else")
         
         return response.content
 

@@ -83,10 +83,12 @@ class MGHTMLLoader(BaseLoader):
     def __init__(
         self,
         file_path: Union[str, Path],
+        link: str = "",
         title: str = "",
         author: str = "",
         time_stamp: str = "",
         description: str = "",
+        hash: str = "",
         open_encoding: Union[str, None] = None,
         bs_kwargs: Union[dict, None] = None,
         get_text_separator: str = "",
@@ -109,10 +111,12 @@ class MGHTMLLoader(BaseLoader):
             )
 
         self.file_path = file_path
+        self.link = link
         self.title = title
         self.author = author
         self.time_stamp = time_stamp
         self.description = description
+        self.hash = hash
         self.open_encoding = open_encoding
         if bs_kwargs is None:
             if not importlib.util.find_spec("lxml"):
@@ -141,10 +145,11 @@ class MGHTMLLoader(BaseLoader):
         #     title = ""
 
         metadata: Dict[str, Union[str, None]] = {
-            "source": str(self.file_path),
+            "source": self.link,
             "title": self.title,
             "description": self.description,
             "author": self.author,
-            "date": self.time_stamp
+            "date": self.time_stamp,
+            "hash": self.hash
         }
         yield Document(page_content=text, metadata=metadata)

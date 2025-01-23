@@ -25,13 +25,13 @@ def save_file(file):
     return file_path
 
 # Function to load and split the data from the PDF file
-def load_and_split_file(file_path):
+def load_and_split_file(file_path, title, author, description, time_stamp, hash):
     # Load the PDF file and split the data into chunks
     #loader = BSHTMLLoader(file_path=file_path)
     loader = MGHTMLLoader(file_path=file_path, open_encoding="utf-8", title="urmom", author="urmom2", description="urmom3", time_stamp="urmoom")
     data = loader.load()
-    #text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    chunks = data
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    chunks = text_splitter.split_documents(data)
 
     return chunks
 
