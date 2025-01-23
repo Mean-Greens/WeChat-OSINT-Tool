@@ -3,6 +3,10 @@ from flask import Flask, session, render_template, request, redirect, url_for, f
 from dotenv import load_dotenv
 import psycopg2
 import hashlib
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from LangFlask.query import query 
 
 load_dotenv()
 
@@ -138,9 +142,9 @@ def search():
     #once they search
     elif request.method == "POST":
         search_term = request.form['search_term']
-        #results = get_results(search_term)
-        #return render_template('results.html', results=results)
-        return render_template('results.html')
+        results = query(search_term)
+        return render_template('results.html', results=results)
+        
     
 
 
