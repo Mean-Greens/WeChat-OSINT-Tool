@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabetized List</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<header>
+    <nav>
+        <div class="logo">
+            <img src="static/meangreens.png" id=logo alt="Mean Greens" />
+        </div>
+        <ul class="navbar">
+            <!--<img src="meangreens.png" id=logo alt="Mean Greens" />-->
+            <li><a href="/search">Search</a></li> 
+            <li><a href="/doc">Documentation</a></li>
+            <li><a href="/wordlist">Wordlist</a></li> 
+            <li class="has-dropdown">
+                <a href="/login">Login</a>
+                <ul>
+                    <li><a href="/list">My Wordlists</a></li>
+                    <li><a href="/logout"><a>Logout</a></li>
+                </ul>
+            </li>        </ul>
+    </nav>
+</header>
+<body>
+    <h1>Word List</h1>
+
+    <!-- Form to add new words -->
+    <form action="/wordlist" method="POST">
+        <label for="new_word">Add a new word:</label>
+        <input type="text" id="new_word" name="new_word" placeholder="Enter a word" required>
+        <button type="submit">Add Word</button>
+    </form>
+
+    <!-- Display the list of words -->
+    <ul>
+        {% for word in words %}
+            <li>{{ word }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
