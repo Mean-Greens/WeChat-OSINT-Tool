@@ -5,8 +5,11 @@
 }
 
 .search-section {
-  position: relative;
-  display: inline-block;
+  /*position: relative;
+  display: inline-block;*/
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Align items vertically in the center */
+  gap: 10px; /* Add spacing between elements */
 }
 
 .search-bar {
@@ -20,9 +23,11 @@
 }
 
 .icon-wrapper {
-  position: absolute;
-  top: 60px; /* Adjust the vertical spacing beneath the search bar */
-  right: 0; /* Align to the right edge of the search bar */
+  display: flex; /* Keep the icon wrapper flexible */
+  align-items: center; /* Align the icon vertically */
+  /*position: absolute;*/
+ /* top: 65px;*/ /* Adjust the vertical spacing beneath the search bar */
+  /*right: 25px;*/ /* Align to the right edge of the search bar */
 }
 
 .filter-icon {
@@ -328,6 +333,7 @@ nav ul li:hover ul {
     color: #000000;
     line-height: 1.6;
     padding-top: 60px;
+    text-align: center;
   }
   
   .container {
@@ -387,10 +393,53 @@ nav ul li:hover ul {
     border-bottom: 1px solid #ddd;
     padding-bottom: 5px;
 }
+
+
 ul {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 20px 0;
 }
+
 li {
-    margin: 5px 0;
+  margin: 5px 0;
+  font-size: 18px;
 }
+
+/* Form styling */
+form {
+  display: flex;
+  flex-direction: row; /* Aligns elements in a row */
+  justify-content: center; /* Centers the row horizontally */
+  align-items: center; /* Aligns elements vertically in the middle */
+  gap: 10px; /* Adds space between the search bar and the button */
+  margin-top: 20px;
+}
+
+
+
+
+input[type="text"] {
+  padding: 10px;
+  font-size: 16px;
+  width: 80%; /* Adjust width as needed */
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #023020;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+

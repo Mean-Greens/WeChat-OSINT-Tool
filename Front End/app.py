@@ -1,17 +1,8 @@
 import os
-from flask import Flask, session, render_template, request, redirect, url_for, flash, jsonify #CSRFProtect
+from flask import Flask, session, render_template, request, redirect, url_for, flash #CSRFProtect
 from dotenv import load_dotenv
 import psycopg2
 import hashlib
-
-#These are importing functions from the "LangFlask" directory
-from LangFlask.embed import embed
-from LangFlask.query import query
-from LangFlask.get_vector_db import get_vector_db
-
-#Don't fully understand what this does, but its in the LangFlask app.py folder
-TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
-os.makedirs(TEMP_FOLDER, exist_ok=True)
 
 load_dotenv()
 
@@ -60,6 +51,17 @@ def index():
             filters['User'] = user_filter
 
     return render_template("index.html", filters=filters)
+
+# Load words from the file (maintain original order)
+def load_words():
+    with open("wordlist.txt", "r", encoding="utf-8") as file:  # Use UTF-8 encoding for non-English characters
+        words = file.read().splitlines()
+    return words
+
+# Add a word to the file
+def add_word(new_word):
+    with open("wordlist.txt", "a", encoding="utf-8") as file:
+        file.write(new_word + "\n")  # Add the word followed by a newline
 
 def get_user_lists():
      # Create a new database connection for each request
@@ -116,11 +118,14 @@ def home():
 @app.route("/wordlist", methods=['GET', 'POST'])
 def wordlist():
     if request.method == "GET":
-        return render_template("wordlist.html")
+        words = load_words()
+        return render_template("wordlist.html", words=words)
     elif request.method == "POST":
-        #search_term = request.form['word']
-        #results = get_results(word)
-        return render_template("wordlist.html") 
+        new_word = request.form.get("new_word", "").strip()
+        if new_word:  # Only add non-empty words
+            add_word(new_word)
+        return redirect(url_for("wordlist"))  # Redirect to avoid form resubmission
+
 
 @app.route("/results")
 def results():
@@ -311,56 +316,6 @@ def hash_password(password, salt=None):
 #     url = url.split("/")[0]
 #     return render_template("idkyet.html", list=list, list_info=list_info, url=url) # Return the page to be rendered
 
-# ------------------------ ROUTES FOR SENDING CALLS TO THE BACKEND ------------------------ #
-@app.route('/embed', methods=['POST'])
-def route_embed():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-
-    file = request.files['file']
-
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    
-    embedded = embed(file)
-
-    if embedded:
-        return jsonify({"message": "File embedded successfully"}), 200
-
-    return jsonify({"error": "File embedded unsuccessfully"}), 400
-
-@app.route('/query', methods=['POST'])
-def route_query():
-    data = request.get_json()
-    response = query(data.get('query'))
-
-    if response:
-        return jsonify({"message": response}), 200
-
-    return jsonify({"error": "Something went wrong"}), 400
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080, debug=True)
-
-#This is a combined version of the /query (from Steven) and /search (From Taylor). I think it should work?
-@app.route("/search", methods=['GET', 'POST'])
-def search():
-    if request.method == "GET":
-        return render_template('search.html')
-    #once they search
-    elif request.method == "POST":
-        search_term = request.form['search_term']
-        response = query(search_term)
-
-        if response:
-            return jsonify({"message": response}), 200
-
-        return jsonify({"error": "Something went wrong"}), 400
-        #results = get_results(search_term)
-        #return render_template('results.html', results=results)
-        return render_template('results.html')
-
-# test = curl -X POST http://localhost:8080/query -H "Content-Type: application/json" -d '{"query": "what is the best kpop song?"}'
 
 # ------------------------ END ROUTES ------------------------ #
 

@@ -13,12 +13,7 @@
         </div>
         <ul class="navbar">
             <!--<img src="meangreens.png" id=logo alt="Mean Greens" />-->
-            <li class="has-dropdown">
-                <a href="/search">Search</a>
-                <ul>
-                    <li><a href="/results">Results</a></li>
-                </ul>
-            </li>
+            <li><a href="/search">Search</a></li> 
             <li><a href="/doc">Documentation</a></li>
             <li><a href="/wordlist">Wordlist</a></li> 
             <li class="has-dropdown">
@@ -31,179 +26,20 @@
     </nav>
 </header>
 <body>
-    <div class="alphabet-navigation">
-        <!-- Alphabet navigation -->
-         
-        <span>
-            <!-- Loop through alphabet links -->
-            <a href="#A">A</a>
-            <a href="#B">B</a>
-            <a href="#C">C</a>
-            <a href="#D">D</a>
-            <a href="#E">E</a>
-            <a href="#F">F</a>
-            <a href="#G">G</a>
-            <a href="#H">H</a>
-            <a href="#I">I</a>
-            <a href="#J">J</a>
-            <a href="#K">K</a>
-            <a href="#L">L</a>
-            <a href="#M">M</a>
-            <a href="#N">N</a>
-            <a href="#O">O</a>
-            <a href="#P">P</a>
-            <a href="#Q">Q</a>
-            <a href="#R">R</a>
-            <a href="#S">S</a>
-            <a href="#T">T</a>
-            <a href="#U">U</a>
-            <a href="#V">V</a>
-            <a href="#W">W</a>
-            <a href="#X">X</a>
-            <a href="#Y">Y</a>
-            <a href="#Z">Z</a>
-        </span>
-    </div>
+    <h1>Word List</h1>
 
-    <div class="search-container">
-        <form action="/newword" method="post">
-            <input type="text" id="word" name="word" required pattern="[A-Za-z]+" maxlength="50" placeholder="Add a Word">
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+    <!-- Form to add new words -->
+    <form action="/wordlist" method="POST">
+        <label for="new_word">Add a new word:</label>
+        <input type="text" id="new_word" name="new_word" placeholder="Enter a word" required>
+        <button type="submit">Add Word</button>
+    </form>
 
-    <!-- Alphabetized list -->
-    <div class="list-section">
-        <h2 id="A">A</h2>
-        <ul>
-            <li>America</li>
-        </ul>
-
-        <h2 id="B">B</h2>
-        <ul>
-            <li>Britian</li>
-        </ul>
-
-        <h2 id="C">C</h2>
-        <ul>
-            <li>Chad</li>
-        </ul>
-
-        <h2 id="D">D</h2>
-        <ul>
-            <li>Dominican Rebuplic</li>
-        </ul>
-
-        <h2 id="E">E</h2>
-        <ul>
-            <li>Ecuador</li>
-        </ul>
-
-        <h2 id="F">F</h2>
-        <ul>
-            <li>Finland</li>
-        </ul>
-
-        <h2 id="G">G</h2>
-        <ul>
-            <li>Greenland</li>
-        </ul>
-
-        <h2 id="H">H</h2>
-        <ul>
-            <li>Haiti</li>
-        </ul>
-
-        <h2 id="I">I</h2>
-        <ul>
-            <li>India</li>
-        </ul>
-
-        <h2 id="J">J</h2>
-        <ul>
-            <li>Jamaica</li>
-        </ul>
-
-        <h2 id="K">K</h2>
-        <ul>
-            <li>Kenya</li>
-        </ul>
-
-        <h2 id="L">L</h2>
-        <ul>
-            <li>Lichtenstien</li>
-        </ul>
-
-        <h2 id="M">M</h2>
-        <ul>
-            <li>Mongolia</li>
-        </ul>
-
-        <h2 id="N">N</h2>
-        <ul>
-            <li>Norway</li>
-        </ul>
-
-        <h2 id="O">O</h2>
-        <ul>
-            <li>Oman</li>
-        </ul>
-
-        <h2 id="P">P</h2>
-        <ul>
-            <li>Panama</li>
-        </ul>
-
-        <h2 id="Q">Q</h2>
-        <ul>
-            <li>Qatar</li>
-        </ul>
-
-        <h2 id="R">R</h2>
-        <ul>
-            <li>Russia</li>
-        </ul>
-
-        <h2 id="S">S</h2>
-        <ul>
-            <li>Somalia</li>
-        </ul>
-
-        <h2 id="T">T</h2>
-        <ul>
-            <li>Thailand</li>
-        </ul>
-
-        <h2 id="U">U</h2>
-        <ul>
-            <li>Uruguay</li>
-        </ul>
-
-        <h2 id="V">V</h2>
-        <ul>
-            <li>Vietnam</li>
-        </ul>
-
-        <h2 id="W">W</h2>
-        <ul>
-            <li>Western Sahara</li>
-        </ul>
-
-        <h2 id="X">X</h2>
-        <ul>
-            <li>X is the only letter than no country starts with fun fact</li>
-        </ul>
-
-        <h2 id="Y">Y</h2>
-        <ul>
-            <li>Yeman</li>
-        </ul>
-
-        <h2 id="Z">Z</h2>
-        <ul>
-            <li>Zimbabwe</li>
-        </ul>
-
-    </div>
+    <!-- Display the list of words -->
+    <ul>
+        {% for word in words %}
+            <li>{{ word }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
