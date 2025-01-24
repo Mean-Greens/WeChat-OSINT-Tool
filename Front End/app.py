@@ -58,13 +58,13 @@ def index():
 
 # Load words from the file (maintain original order)
 def load_words():
-    with open("wordlist.txt", "r", encoding="utf-8") as file:  # Use UTF-8 encoding for non-English characters
+    with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "LangFlask/Wordlist.txt"), "r", encoding="utf-8") as file:  # Use UTF-8 encoding for non-English characters
         words = file.read().splitlines()
     return words
 
 # Add a word to the file
 def add_word(new_word):
-    with open("wordlist.txt", "a", encoding="utf-8") as file:
+    with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "LangFlask/Wordlist.txt"), "a", encoding="utf-8") as file:
         file.write(new_word + "\n")  # Add the word followed by a newline
 
 def get_user_lists():
