@@ -66,7 +66,7 @@ BASE_URL_2 = '&ie=utf8'
 QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
 SEARCH_TERM = '香蕉布丁' # Banana pudding
 
-FORCE_WORDLIST_RESTART = True
+FORCE_WORDLIST_RESTART = False
 
 # Get the directory path of the current file
 #current_dir = os.path.dirname(os.path.abspath(__file__))
