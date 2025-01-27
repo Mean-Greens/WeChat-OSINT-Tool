@@ -1,3 +1,5 @@
+# Need documentation for this file
+
 # This file contains a hardcoded cookies which are required to bypass Sogou bot detection.
 # We will attempt automatic creation/retrieval of this cookie later.
 #
@@ -327,7 +329,7 @@ if __name__ == "__main__":
     # main()
     try:
         scrape()
-    except httpx.ConnectError as e1:
+    except httpx.ConnectError | httpx.ProxyError as e1:
         logging.error(e1)
         scrape()
     except Exception as e:
