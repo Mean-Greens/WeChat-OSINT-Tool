@@ -1,3 +1,5 @@
+# Need documentation for this file
+
 import os
 from langchain_ollama import OllamaEmbeddings
 # This is the older version of Chroma to be deprecated, but the only one to work with numpy > 2.0.0 currently

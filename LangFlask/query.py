@@ -1,3 +1,5 @@
+# Need documentation for this file
+
 import os
 import sys
 from langchain_ollama import ChatOllama
@@ -25,7 +27,14 @@ def get_prompt():
         Original question: {question}""",
     )
 
-    template = """You are an AI assistant that specializes in OSINT. You must respond ONLY in English. You must list the hashes of the documents where you got your information. Your task is to answer to the question based ONLY on the following context and list the source hash values after:
+    template = """You are an AI assistant that specializes in OSINT. You must respond ONLY in English. You must use ONLY the information in the context below.
+    At the end of your response, you must list the sources you used to answer the question in the following format:
+    Begin format
+    Source Title: 
+    Source Hash:
+    End format
+
+    Context:
     {context}
     Question: {question}
     """

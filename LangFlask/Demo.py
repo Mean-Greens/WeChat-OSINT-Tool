@@ -287,11 +287,6 @@ def store_websites(documents:list):
             # Save the HTML file to an Articles folder on the desktop
             Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc[0].metadata.get("hash")}.html')).write_text(doc[0].page_content)
 
-            # db_chunked.load_and_split_file([doc])
-
-    #db.add_documents(documents)
-    #db.persist()
-
 def document_exists_by_hash(vectorstore, hash_value):
     results = vectorstore.similarity_search_with_score(
         query="",
@@ -299,34 +294,29 @@ def document_exists_by_hash(vectorstore, hash_value):
         filter={"hash": hash_value}
     )
     return bool(results)
-    
 
 @timer
 def main(search_term):
     documents = sogou_searcher(search_term)
     store_websites(documents)
 
-    # question = QUESTION
-    # results = query(SEARCH_TERM)
-
-    # print(results)
-
 def scrape():
     while True:
+            # Gets the new search terms from the list every time it loops through the list again
             queries = read_search_terms()
+
             for query in queries:
                 main(query)
+
                 # Generate a random time between 4 and 6 minutes (in seconds)
                 random_sleep_time = random.uniform(15 * 60, 20 * 60)
+
                 # Sleep for the random time
                 time.sleep(random_sleep_time)
                 print(f"Slept for {random_sleep_time / 60:.2f} minutes.")
                 logging.info(f"Slept for {random_sleep_time / 60:.2f} minutes.")
                 
-                #time.sleep(300) # Sleep for 5 minutes to avoid being blocked
-
 if __name__ == "__main__":
-    # main()
     try:
         scrape()
     except httpx.ConnectError | httpx.ProxyError as e1:
@@ -334,3 +324,4 @@ if __name__ == "__main__":
         scrape()
     except Exception as e:
         logging.critical(e)
+        raise e
