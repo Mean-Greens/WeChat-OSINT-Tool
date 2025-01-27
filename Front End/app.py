@@ -6,7 +6,9 @@ import hashlib
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from LangFlask.query import query 
+
+from LangFlask.query import query
+from LangFlask.Demo import FORCE_WORDLIST_RESTART
 
 load_dotenv()
 
@@ -308,7 +310,12 @@ def hash_password(password, salt=None):
     hashed_password = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000)
     return salt.hex(), hashed_password.hex()
 
-
+# This function forces the new wordlist to run
+@app.route('/force-run', methods=['POST'])
+def force_run_endpoint():
+    global FORCE_WORDLIST_RESTART
+    FORCE_WORDLIST_RESTART = True
+    return "Forced new wordlist to run"
 
 # @app.route("/shelf/list/<id>", methods=['GET'])
 # # FIXME only allow to work for logged in user w/ try catch
