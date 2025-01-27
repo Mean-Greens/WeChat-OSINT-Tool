@@ -23,6 +23,7 @@ import random
 import logging
 from rich.traceback import install
 from pathlib import Path
+from collections import OrderedDict
 
 install(show_locals=True)
 
@@ -103,8 +104,9 @@ def read_search_terms():
         search_terms = f.readlines()
         for i, term in enumerate(search_terms):
             search_terms[i] = term.strip()
-        search_terms = set(list(filter(None, search_terms)))
-    return search_terms
+        search_terms = list(filter(None, search_terms))
+        unique_search_terms = list(OrderedDict.fromkeys(search_terms))
+    return unique_search_terms
 
 def timeConvert(unix_timestamp): 
     # Convert the Unix timestamp to a datetime object 
@@ -308,7 +310,7 @@ def scrape():
             # This refreshes the wordlist after all terms are scraped
             queries = read_search_terms()
 
-            for query in queries:
+            for query in reversed(queries):
                 if FORCE_WORDLIST_RESTART:
                     FORCE_WORDLIST_RESTART = False
                     break
