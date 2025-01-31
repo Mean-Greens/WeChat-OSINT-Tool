@@ -43,20 +43,17 @@ pip install httpx beautifulsoup4 ollama chromadb
 
 HEADERS = {
             'Host': 'weixin.sogou.com',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
             'Accept-Encoding': 'gzip, deflate, br, zstd',
-            'DNT': '1',
-            'Sec-GPC': '1',
+            'Referer': 'https://www.sogou.com/',
             'Connection': 'keep-alive',
-            'Referer': 'https://weixin.sogou.com/',
-            'Cookie': 'IPLOC=NL; SUID=8CFD08D41AA7A20B000000006781FE67; cuid=AAHKs2cKUQAAAAuipsd9DwIA4wQ=; SUV=1736572520882172; ABTEST=0|1736572526|v1; SNUID=3F49BB67B4B59FD3FF27C4B3B4094BC1; ariaDefaultTheme=undefined',
+            'Cookie': 'IPLOC=NL; SUID=8CFD08D41AA7A20B000000006781FE67; cuid=AAHKs2cKUQAAAAuipsd9DwIA4wQ=; SUV=1736572520882172; ABTEST=0|1736572526|v1; SNUID=6FC3B7B802072DC4CDB80D110208C9E5; ariaDefaultTheme=undefined',
             'Upgrade-Insecure-Requests': '1',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'same-site',
-            'Sec-Fetch-User': '?1',
             'Priority': 'u=0, i'
         }
 
@@ -67,7 +64,7 @@ BASE_URL_2 = '&ie=utf8'
 QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
 SEARCH_TERM = '香蕉布丁' # Banana pudding
 
-FORCE_WORDLIST_RESTART = False
+from constants import FORCE_WORDLIST_RESTART
 
 # Get the directory path of the current file
 #current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -99,13 +96,21 @@ def timer(func):
         return result
     return wrapper
 
+def force_wordlist():
+    global FORCE_WORDLIST_RESTART
+    FORCE_WORDLIST_RESTART = True
+    return
+
+# Reads througn wordlist.txt. It takes every other word starting with the second word to only do 
+# searches with the Chinese terms. 
 def read_search_terms():
     with open('Wordlist.txt', 'r', encoding='utf-8') as f:
         search_terms = f.readlines()
         for i, term in enumerate(search_terms):
             search_terms[i] = term.strip()
         search_terms = list(filter(None, search_terms))
-        unique_search_terms = list(OrderedDict.fromkeys(search_terms))
+        chinese_search_terms = search_terms[1::2]
+        unique_search_terms = list(OrderedDict.fromkeys(chinese_search_terms))
     return unique_search_terms
 
 def timeConvert(unix_timestamp): 
@@ -114,6 +119,8 @@ def timeConvert(unix_timestamp):
     # Format the datetime object as a string 
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
+#Gets the HTML at the specified url
+#It will attempt to get the HTML 5 times with a two minute wait between each attempt
 def get_html(url, retries=5, wait_time=120):
     with httpx.Client() as client:
         attempt = 0
@@ -135,8 +142,9 @@ def get_html(url, retries=5, wait_time=120):
             print(f"Non-200 response: {url} - Status Code: {response.status_code}")
             logging.error(f"Non-200 response: {url} - Status Code: {response.status_code}")
         
-        return BeautifulSoup(response.text, 'html.parser')
-    
+        return response.content, BeautifulSoup(response.text, 'html.parser')
+
+# Gets to wechat link to the found article
 def get_wechat_link(url):
     with httpx.Client() as client:
         
@@ -149,11 +157,10 @@ def get_wechat_link(url):
             return None
         elif response.status_code == 200:
             WCUrl = ""
-            pattern = r"url \+= '(.*?)';"
+            pattern = r"url \+= '(.*?)';" #Regular Expression to match the wechat link in the response
             matches = re.findall(pattern, response.text)
             for match in matches:
                 WCUrl += match
-
             return WCUrl   
         else:
             print(response.status_code)
@@ -162,6 +169,9 @@ def get_wechat_link(url):
             logging.error("Failed to retrieve the website")
             return None
         
+
+#Appears to pull the entire website, not just the HTML. I don't know if that's a hundred percent true though.
+#We could probably combine this function with the Read_HTML function.
 def read_website(url, retries=5, wait_time=120):
     """
     Reads and returns the body of the website at the given url.
@@ -171,6 +181,7 @@ def read_website(url, retries=5, wait_time=120):
         str: The body of the website.
         None: If the request fails.
     """
+    
     with httpx.Client() as client:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0'}
 
@@ -204,13 +215,14 @@ def read_website(url, retries=5, wait_time=120):
             logging.error(response.status_code)
             logging.error("Failed to retrieve the website")
             return None
-   
+
+#Main search function. Calls many of the functions above. 
 def sogou_searcher(query):
 
     documents = []
     print(query)
     logging.info(query)
-    html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
+    content, html = get_html(f'{BASE_URL_1}{query}{BASE_URL_2}')
 
     try:
         body = html.find('body')
@@ -237,6 +249,7 @@ def sogou_searcher(query):
         if match:
             date = match.group(1)
 
+        #This part formats the found links from the scraped page to then get the WeChat link
         link_tag = link_box.find('a', href=True)
         link = "https://weixin.sogou.com" + link_tag.get('href')
 
@@ -264,8 +277,8 @@ def sogou_searcher(query):
 
     return documents
 
+# store each document in a vector embedding database
 def store_websites(documents:list):
-    # store each document in a vector embedding database
     db = get_vector_db()
 
     # Chunk documents and store in a seperate collection that the LLM will use
@@ -291,6 +304,7 @@ def store_websites(documents:list):
             # Save the HTML file to an Articles folder on the desktop
             Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc[0].metadata.get("hash")}.html')).write_text(doc[0].page_content)
 
+# checks to see if a document is in the VectorDB already using the hash
 def document_exists_by_hash(vectorstore, hash_value):
     results = vectorstore.similarity_search_with_score(
         query="",
@@ -329,7 +343,8 @@ if __name__ == "__main__":
     # main()
     try:
         scrape()
-    except httpx.ConnectError | httpx.ProxyError as e1:
+    # except httpx.RequestError as e1: Might catch errors more broadly
+    except (httpx.ConnectError, httpx.ProxyError) as e1:
         logging.error(e1)
         scrape()
     except Exception as e:
