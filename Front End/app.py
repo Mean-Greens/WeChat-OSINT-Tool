@@ -7,7 +7,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from LangFlask.query import query
+from LangFlask.query import query, query_translation
 from LangFlask.constants import FORCE_WORDLIST_RESTART
 
 load_dotenv()
@@ -68,7 +68,10 @@ def load_words():
 # Add a word to the file
 def add_word(new_word):
     with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "LangFlask/Wordlist.txt"), "a", encoding="utf-8") as file:
+        chinese_word = query_translation(new_word)
         file.write(new_word + "\n")  # Add the word followed by a newline
+        if chinese_word:
+            file.write(chinese_word + "\n")
 
 def get_user_lists():
      # Create a new database connection for each request
