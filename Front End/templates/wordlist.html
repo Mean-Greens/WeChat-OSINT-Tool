@@ -38,7 +38,8 @@
     <!-- Display the list of words -->
     <ul>
         {% for word in words %}
-            <li>{{ word }}</li>
+            {% if loop.index % 3 == 1 and not loop.first %}<br>{% endif %}
+            {{ word }}{% if not loop.last and loop.index % 3 != 0 %}, {% endif %}
         {% endfor %}
     </ul>
 </body>
