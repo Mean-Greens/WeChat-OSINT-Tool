@@ -267,11 +267,12 @@ def sogou_searcher(query):
             "description": description,
             "author": author,
             "date": date,
-            "hash": web_hash
+            "hash": web_hash,
+            "keyword": query
         }
 
     
-        doc = [Document(page_content=website, metadata=metadata), Document(page_content = normalized_text, metadata=metadata)]
+        doc = [Document(page_content=website, metadata=metadata), Document(page_content=normalized_text, metadata=metadata)]
         
         documents.append(doc)
 
