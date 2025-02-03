@@ -27,16 +27,23 @@ def get_prompt():
         Original question: {question}""",
     )
 
-    template = """You are an AI assistant that specializes in OSINT. You must respond ONLY in English. You must use ONLY the information in the context below.
-    At the end of your response, you must list the sources you used to answer the question in the following format:
-    Begin format
-    Source Title: 
-    Source Hash:
-    End format
 
-    Context:
+    template = """Ignore all previous instructions. You are an AI assistant that specializes in OSINT. You must respond ONLY in English. 
+
+    You MUST answer the question **ONLY** using the information from the provided context. **Do not use outside knowledge.** If the context does not contain relevant information to answer the question, follow these steps:
+
+    1. Clearly state: *"I cannot find any useful information in the provided documents."*
+    2. Provide **exactly five** search terms the user could use in a search engine to find relevant answers.
+
+    **Context:**
     {context}
-    Question: {question}
+
+    **Question:** {question}
+
+    **Important Rules:**
+    - If the answer is in the context, provide a direct answer using ONLY that information.
+    - If the answer is NOT in the context, DO NOT GUESS. DO NOT provide external knowledge.
+    - If needed, list **exactly five** search terms for further research.
     """
 
     #Answer the question based ONLY on the following context:
@@ -63,14 +70,15 @@ def query(input):
             prompt=QUERY_PROMPT
         )
         
-        # output = db.as_retriever(search_kwargs={'k': 4})
-        # #output = db.similarity_search_by_vector(k=1)
-        # #docs = output.get_relevant_documents(input)
-        # docs = output.invoke(input)
-        # for doc in docs:
-        #     print(doc.metadata)
-        #     print(doc.id)
-        #     print(doc.page_content)
+        output = db.as_retriever(search_kwargs={'k': 5})
+        
+        translated_input = query_translation(input)
+        print(translated_input)
+        docs = output.invoke(translated_input)
+        
+        for doc in docs:
+            print(doc.metadata.get('hash'))
+            print(doc.metadata.get('title'))
 
         # quit()
 
@@ -89,7 +97,7 @@ def query(input):
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output
         chain = (
-            {"context": retriever, "question": RunnablePassthrough()}
+            {"context": output, "question": RunnablePassthrough()}
             | prompt
             | llm
             | StrOutputParser()
