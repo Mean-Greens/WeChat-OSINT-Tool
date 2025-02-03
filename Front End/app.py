@@ -61,7 +61,7 @@ def index():
 # Load words from the file (maintain original order)
 def load_words():
     with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "LangFlask/Wordlist.txt"), "r", encoding="utf-8") as file:  # Use UTF-8 encoding for non-English characters
-        words = file.read().splitlines()[::2]
+        words = file.read().splitlines()
         chinese_search_terms = file.read().splitlines()[1::2]
     return words
 
