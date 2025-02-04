@@ -307,12 +307,8 @@ def store_websites(documents:list):
 
 # checks to see if a document is in the VectorDB already using the hash
 def document_exists_by_hash(vectorstore, hash_value):
-    results = vectorstore.similarity_search_with_score(
-        query="",
-        k=1,
-        filter={"hash": hash_value}
-    )
-    return bool(results)
+    results = vectorstore.get(where={"hash": hash_value})  # Direct metadata lookup
+    return bool(results["documents"])  # Check if any documents exist
 
 @timer
 def main(search_term):
