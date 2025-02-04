@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import psycopg2
 import hashlib
 import sys
+from markupsafe import Markup
+import markdown
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -35,6 +37,11 @@ app.secret_key = os.getenv("SECRET")
 
 #     if 'userid' not in session:
 #         return redirect(url_for('login'))
+
+def read_markdown_file(file_path):
+    with open(file_path, 'r') as f:
+        content = f.read()
+    return markdown.markdown(content)
 
 def get_db_connection():
    conn = psycopg2.connect(
@@ -172,7 +179,8 @@ def retrieve_lists():
 
 @app.route("/doc")
 def doc():
-    return render_template("doc.html")
+    md_content = read_markdown_file(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md"))
+    return render_template("doc.html", content=Markup(md_content))
 
 @app.errorhandler(404)
 def not_found(e):
@@ -336,4 +344,4 @@ def force_run_endpoint():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=12345)
