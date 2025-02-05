@@ -340,8 +340,8 @@ if __name__ == "__main__":
     # main()
     try:
         scrape()
-    # except httpx.RequestError as e1: Might catch errors more broadly
-    except (httpx.ConnectError, httpx.ProxyError) as e1:
+    except httpx.RequestError as e1: # Might catch errors more broadly
+    # except (httpx.ConnectError, httpx.ProxyError) as e1:
         logging.error(e1)
         scrape()
     except Exception as e:
