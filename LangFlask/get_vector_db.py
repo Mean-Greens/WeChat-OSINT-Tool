@@ -6,11 +6,16 @@ from langchain_ollama import OllamaEmbeddings
 #from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
 
+#Directory where the ChromaDB is stored
 CHROMA_PATH = os.getenv('CHROMA_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'chroma'))
+#Names the collection
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'LangFlask')
+#Names the chuncked collection
 COLLECTION_NAME_CHUNKED = os.getenv('COLLECTION_CHUNKED_NAME', 'Chunked')
+#Declares which text embedding model we are going to use
 TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'mxbai-embed-large')
 
+#This function gets the DB for future use
 def get_vector_db():
     embedding = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL)
 
@@ -22,6 +27,7 @@ def get_vector_db():
 
     return db
 
+#This function gets the chunked DB for future use
 def get_chunked_db():
     embedding = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL)
 

@@ -11,6 +11,11 @@ from get_vector_db import get_vector_db
 
 TEMP_FOLDER = os.getenv('TEMP_FOLDER', './_temp')
 
+#The functions of this page behave as follows: A document is found and needs to be added to the database. 
+#This document is then saved in a temporary folder on the computer, but not the database, "save_file(file)"
+#The document then needs to be chunked for better use by the LLM, "load_and_split_file()"
+#The document is then saved in the DB, "embed()"
+
 # Function to check if the uploaded file is allowed (only PDF files)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'html'}

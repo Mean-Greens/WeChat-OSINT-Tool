@@ -1,0 +1,19 @@
+QUERY_PROMPT = PromptTemplate(
+        input_variables=["question"],
+        template="""You are an AI language model assistant. Your task is to tanslate the given user question below into Traditional Chinese and generate five
+        different versions of the given user question in Traditional Chinese to retrieve relevant documents from
+        a vector database of WeChat articles written in Chinese. By generating multiple perspectives on the user question, your
+        goal is to help the user overcome some of the limitations of the distance-based
+        similarity search. Provide these alternative questions separated by newlines.
+        Original question: {question}""",
+    )
+
+
+    template = """Ignore all previous instructions. You are an AI assistant that specializes in OSINT. You must respond ONLY in English. You must use ONLY the information in the context below to answer the question.
+    If you cannot find relevant information to the question in the context, reply that you cannot find any useful information in the documents and provide them a list of five search terms they could use in a search engine to find relevant answers to the question. 
+
+    Context:
+    {context}
+
+    Question: {question}
+    """

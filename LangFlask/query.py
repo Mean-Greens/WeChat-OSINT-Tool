@@ -16,6 +16,7 @@ from get_vector_db import get_vector_db, get_chunked_db
 LLM_MODEL = os.getenv('LLM_MODEL', 'aya-expanse:32b')
 
 # Function to get the prompt templates for generating alternative questions and answering based on context
+# This gives the LLM a kind of base behavior to work off of. 
 def get_prompt():
     QUERY_PROMPT = PromptTemplate(
         input_variables=["question"],
@@ -64,40 +65,26 @@ def query(input):
         QUERY_PROMPT, prompt = get_prompt()
 
         # Set up the retriever to generate multiple queries using the language model and the query prompt
-        retriever = MultiQueryRetriever.from_llm(
-            db.as_retriever(), 
-            llm,
-            prompt=QUERY_PROMPT
-        )
+        # retriever = MultiQueryRetriever.from_llm(
+        #     db.as_retriever(), 
+        #     llm,
+        #     prompt=QUERY_PROMPT
+        # )
         
         output = db.as_retriever(search_kwargs={'k': 5})
         
         translated_input = query_translation(input)
         print(translated_input)
-        docs = output.invoke(translated_input)
+        context_docs = output.invoke(translated_input)
         
-        for doc in docs:
+        for doc in context_docs:
             print(doc.metadata.get('hash'))
             print(doc.metadata.get('title'))
-
-        # quit()
-
-        # all_documents = db._collection.get(include=["metadatas", "documents"])
-
-        # # Print hash and page content for each document
-        # for metadata, page_content in zip(all_documents["metadatas"], all_documents["documents"]):
-        #     hash_value = metadata.get("hash", "No hash found")
-        #     title = metadata.get("title", "NO title")
-        #     print(f"Hash: {hash_value}")
-        #     print(f"Title: {title}")
-        #     print(f"Page Content: {page_content}")
-        #     print("-" * 50)  # Separator for readability
-
-        # quit()
+            print(doc.page_content)
 
         # Define the processing chain to retrieve context, generate the answer, and parse the output
         chain = (
-            {"context": output, "question": RunnablePassthrough()}
+            {"context": context_docs, "question": RunnablePassthrough()}
             | prompt
             | llm
             | StrOutputParser()
@@ -109,7 +96,7 @@ def query(input):
 
     return None
 
-# Main function to handle the query process
+# Main function to handle the query translation process. 
 def query_translation(input):
 
     if input:
