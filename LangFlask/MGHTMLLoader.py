@@ -1,11 +1,20 @@
 import importlib.util
 import logging
 from pathlib import Path
+import sys
 from typing import Dict, Iterator, Union
+import unicodedata
+from bs4 import BeautifulSoup
+import os
 
 from langchain_core.documents import Document
 
 from langchain_community.document_loaders.base import BaseLoader
+
+# Add parent directory to Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from Demo import *
 
 logger = logging.getLogger(__name__)
 
@@ -153,3 +162,44 @@ class MGHTMLLoader(BaseLoader):
             "hash": self.hash
         }
         yield Document(page_content=text, metadata=metadata)
+
+def reload_database(folder_path):
+    documents = []
+
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith(".html"):
+            file_path = os.path.join(folder_path, file_name)
+            soup = BeautifulSoup(open(file_path, "r", encoding="utf-8"), "html.parser")
+            
+            # Get a string of the html to save to folder of html files
+            website = str(soup)
+
+            # Strip the text out of the html and normalize it
+            body = soup.body
+            body_text = body.get_text(strip=True)
+            normalized_text = unicodedata.normalize("NFKD", body_text)
+            normalized_text = ' '.join(normalized_text.split())
+
+            # Get the metadata
+            metadata: Dict[str, Union[str, None]] = {
+            "source": "test",
+            "title": "test",
+            "description": "testing",
+            "author": "me",
+            "date": "idk",
+            "hash": 1234,
+            "keyword": "something"
+            }
+
+            # Create document objects for the website and the normalized text to store in the database
+            doc = [Document(page_content=website, metadata=metadata), Document(page_content=normalized_text, metadata=metadata)]
+        
+            # The store_websites function is a function that stores the websites in the database and takes a list of document objects
+            documents.append(doc)
+
+    # store the websites in the database
+    store_websites(documents)
+    return
+
+if __name__ == "__main__":
+    reload_database(os.path.join(os.path.dirname(__file__), "html"))
