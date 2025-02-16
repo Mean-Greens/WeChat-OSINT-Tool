@@ -15,6 +15,7 @@ from langchain_community.document_loaders.base import BaseLoader
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from Demo import *
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -181,14 +182,52 @@ def reload_database(folder_path):
             normalized_text = ' '.join(normalized_text.split())
 
             # Get the metadata
+            metadata_folder = os.path.join(os.path.dirname(__file__), "metadata")
+            metadata_file_path = os.path.join(metadata_folder, "metadata_deduplicated.json")
+
+            with open(metadata_file_path, "r", encoding="utf-8") as metadata_file:
+                metadata = json.load(metadata_file)
+
+            for data in metadata:
+                if data["key"] == "hash" and data["string_value"] == file_name.replace(".html", ""):
+                    id = data["id"]
+                    break
+
+            data_matching_hash = []
+            for data in metadata:
+                if data["id"] == id:
+                    data_matching_hash.append(data)
+
+            source = ""
+            title = ""
+            description = ""
+            author = ""
+            date = ""
+            keyword = ""
+
+            for data in data_matching_hash:
+                if data["key"] == "source":
+                    source = data["string_value"]
+                elif data["key"] == "title":
+                    title = data["string_value"]
+                elif data["key"] == "description":
+                    description = data["string_value"]
+                elif data["key"] == "author":
+                    author = data["string_value"]
+                elif data["key"] == "date":
+                    date = data["string_value"]
+                elif data["key"] == "keyword":
+                    keyword = data["string_value"]
+
+
             metadata: Dict[str, Union[str, None]] = {
-            "source": "test",
-            "title": "test",
-            "description": "testing",
-            "author": "me",
-            "date": "idk",
-            "hash": 1234,
-            "keyword": "something"
+            "source": source,
+            "title": title,
+            "description": description,
+            "author": author,
+            "date": date,
+            "hash": file_name.replace(".html", ""),
+            "keyword": keyword
             }
 
             # Create document objects for the website and the normalized text to store in the database
@@ -200,6 +239,33 @@ def reload_database(folder_path):
     # store the websites in the database
     store_websites(documents)
     return
+
+def deduplicate_metadata():
+    '''
+    Output the metadata from the sqlite database to a JSON file.
+    This function then filters out duplicate metadata items based on the hash key.
+    '''
+    metadata_folder = os.path.join(os.path.dirname(__file__), "metadata")
+    metadata_file_path = os.path.join(metadata_folder, "metadata.json")
+
+    with open(metadata_file_path, "r", encoding="utf-8") as metadata_file:
+        metadata = json.load(metadata_file)
+
+    unique_hash_ids = []
+    seen_hashes = set()
+
+    for data in metadata:
+        if data["key"] == "hash" and data["string_value"] not in seen_hashes:
+            unique_hash_ids.append(data["id"])
+            seen_hashes.add(data["string_value"])
+
+    # Filter out items that do not have an id in unique_hash_ids
+    deduplicated_metadata = [data for data in metadata if data["id"] in unique_hash_ids]
+
+    # Save the deduplicated metadata to a new JSON file
+    deduplicated_metadata_file_path = os.path.join(metadata_folder, "metadata_deduplicated.json")
+    with open(deduplicated_metadata_file_path, "w", encoding="utf-8") as deduplicated_metadata_file:
+        json.dump(deduplicated_metadata, deduplicated_metadata_file, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
     reload_database(os.path.join(os.path.dirname(__file__), "html"))
