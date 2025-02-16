@@ -303,7 +303,7 @@ def store_websites(documents:list):
             db_chunked.add_documents(chunks)
 
             # Save the HTML file to an Articles folder on the desktop
-            Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc[0].metadata.get("hash")}.html')).write_text(doc[0].page_content)
+            Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/{doc[0].metadata.get("hash")}.html')).write_text(doc[0].page_content, encoding='utf-8')
 
 # checks to see if a document is in the VectorDB already using the hash
 def document_exists_by_hash(vectorstore, hash_value):
