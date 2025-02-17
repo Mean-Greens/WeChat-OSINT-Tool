@@ -164,6 +164,7 @@ class MGHTMLLoader(BaseLoader):
         }
         yield Document(page_content=text, metadata=metadata)
 
+@timer
 def reload_database(folder_path):
     documents = []
 
