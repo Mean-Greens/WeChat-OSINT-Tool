@@ -328,9 +328,14 @@ def scrape():
                     FORCE_WORDLIST_RESTART = False
                     break
                 
-                #Calls the main function which will call all the other functions needed to 
-                #complete scraping. 
-                main(query)
+                try:
+                    # Calls the main function which will call all the other functions needed to 
+                    # complete scraping. 
+                    main(query)
+                except httpx.ConnectError as e:
+                    print(f"ConnectError occurred: {e}")
+                    logging.error(f"ConnectError occurred: {e}")
+                    continue  # Retry the next query
 
                 # Generate a random time between 4 and 6 minutes (in seconds)
                 random_sleep_time = random.uniform(15 * 60, 20 * 60)
@@ -341,11 +346,9 @@ def scrape():
                 logging.info(f"Slept for {random_sleep_time / 60:.2f} minutes.")
 
 if __name__ == "__main__":
-    # main()
     try:
         scrape()
-    except httpx.RequestError as e1: # Might catch errors more broadly
-    # except (httpx.ConnectError, httpx.ProxyError) as e1:
+    except (httpx.RequestError, httpx.ConnectError, httpx.ProxyError) as e1:
         logging.error(e1)
         scrape()
     except Exception as e:
