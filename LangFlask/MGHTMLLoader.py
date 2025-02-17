@@ -219,6 +219,8 @@ def reload_database(folder_path):
                 elif data["key"] == "keyword":
                     keyword = data["string_value"]
 
+            # rehash the article
+            web_hash = hashlib.sha256(normalized_text.encode('utf-8')).hexdigest()
 
             metadata: Dict[str, Union[str, None]] = {
             "source": source,
@@ -226,7 +228,7 @@ def reload_database(folder_path):
             "description": description,
             "author": author,
             "date": date,
-            "hash": file_name.replace(".html", ""),
+            "hash": web_hash,
             "keyword": keyword
             }
 
