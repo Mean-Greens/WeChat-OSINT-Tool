@@ -13,7 +13,7 @@ COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'LangFlask')
 #Names the chuncked collection
 COLLECTION_NAME_CHUNKED = os.getenv('COLLECTION_CHUNKED_NAME', 'Chunked')
 #Declares which text embedding model we are going to use
-TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'mxbai-embed-large')
+TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'shaw/dmeta-embedding-zh')
 
 #This function gets the DB for future use
 def get_vector_db():
