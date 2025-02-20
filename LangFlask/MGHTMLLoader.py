@@ -274,3 +274,4 @@ def deduplicate_metadata():
 
 if __name__ == "__main__":
     reload_database(os.path.join(os.path.dirname(__file__), "html"))
+    # deduplicate_metadata()
