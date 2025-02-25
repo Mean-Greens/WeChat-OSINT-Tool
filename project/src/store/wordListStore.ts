@@ -2,18 +2,46 @@ import { create } from 'zustand';
 
 interface WordListState {
   words: string[];
-  addWord: (word: string) => void;
-  removeWord: (word: string) => void;
+  addWord: (word: string) => Promise<void>;
+  removeWord: (word: string) => Promise<void>;
+  fetchWords: () => Promise<void>;
 }
 
 export const useWordListStore = create<WordListState>((set) => ({
   words: [],
-  addWord: (word) =>
-    set((state) => ({
-      words: [...new Set([...state.words, word])],
-    })),
-  removeWord: (word) =>
-    set((state) => ({
-      words: state.words.filter((w) => w !== word),
-    })),
+  fetchWords: async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/words');
+      const data = await res.json();
+      set({ words: data.words });
+    } catch (error) {
+      console.error('Error fetching words:', error);
+    }
+  },
+  addWord: async (word) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/words', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ word }),
+      });
+      const data = await res.json();
+      set({ words: data.words });
+    } catch (error) {
+      console.error('Error adding word:', error);
+    }
+  },
+  removeWord: async (word) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/words/${word}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      set({ words: data.words });
+    } catch (error) {
+      console.error('Error removing word:', error);
+    }
+  },
 }));
