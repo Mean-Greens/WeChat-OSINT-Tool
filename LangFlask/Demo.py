@@ -298,7 +298,7 @@ def store_websites(documents:list):
             db.add_documents([Document(page_content=' ', metadata=doc[0].metadata)])
 
             chunk_doc = doc[1]
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200) #Original 500, 100
             chunks = text_splitter.split_documents([chunk_doc])
             db_chunked.add_documents(chunks)
 
@@ -337,7 +337,7 @@ def scrape():
                     logging.error(f"ConnectError occurred: {e}")
                     continue  # Retry the next query
 
-                # Generate a random time between 4 and 6 minutes (in seconds)
+                # Generate a random time between 15 and 20 minutes (in seconds)
                 random_sleep_time = random.uniform(15 * 60, 20 * 60)
                 
                 # Sleep for the random time
@@ -348,8 +348,15 @@ def scrape():
 if __name__ == "__main__":
     try:
         scrape()
-    except (httpx.RequestError, httpx.ConnectError, httpx.ProxyError) as e1:
+    except (httpx.RequestError, httpx.ConnectError, httpx.ProxyError, httpx.ReadTimeout) as e1:
         logging.error(e1)
+
+        # Generate a random time between 15 and 20 minutes (in seconds)
+        random_sleep_time = random.uniform(15 * 60, 20 * 60)
+        
+        # Sleep for the random time
+        time.sleep(random_sleep_time)
+        
         scrape()
     except Exception as e:
         logging.critical(e)
