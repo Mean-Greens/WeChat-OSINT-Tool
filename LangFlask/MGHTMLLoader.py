@@ -246,13 +246,13 @@ def reload_database(folder_path):
     store_websites(documents)
     return
 
-def deduplicate_metadata():
+def deduplicate_metadata(file_name="metadata.json"):
     '''
     Output the metadata from the sqlite database to a JSON file.
     This function then filters out duplicate metadata items based on the hash key.
     '''
     metadata_folder = os.path.join(os.path.dirname(__file__), "metadata")
-    metadata_file_path = os.path.join(metadata_folder, "metadata.json")
+    metadata_file_path = os.path.join(metadata_folder, file_name)
 
     with open(metadata_file_path, "r", encoding="utf-8") as metadata_file:
         metadata = json.load(metadata_file)
@@ -290,6 +290,6 @@ if __name__ == "__main__":
         reload_database(os.path.join(os.path.dirname(__file__), "html"))
     elif args.mode == 2:
         # Deduplicate the metadata
-        deduplicate_metadata()
+        deduplicate_metadata(args.filename)
     else:
         print("Invalid mode number. Please enter 1 or 2.")
