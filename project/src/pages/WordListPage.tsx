@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useWordListStore } from '../store/wordListStore';
 
 export function WordListPage() {
   const [newWord, setNewWord] = useState('');
-  const { words, addWord, removeWord } = useWordListStore();
+  const { words, addWord, removeWord, fetchWords } = useWordListStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchWords();
+  }, [fetchWords]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newWord.trim()) {
-      addWord(newWord.trim());
+      await addWord(newWord.trim());
       setNewWord('');
     }
   };

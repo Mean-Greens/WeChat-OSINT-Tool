@@ -6,16 +6,26 @@ export function QueryPage() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const words = useWordListStore((state) => state.words);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate LLM response
-    setTimeout(() => {
-      setResponse(`Sample response using words: ${words.join(', ')}`);
+    try {
+      const res = await fetch('http://localhost:5000/api/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      setResponse(data.response);
+    } catch (error) {
+      console.error('Error:', error);
+      setResponse('Error: Failed to get response from server');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
