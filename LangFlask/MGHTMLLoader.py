@@ -6,6 +6,7 @@ from typing import Dict, Iterator, Union
 import unicodedata
 from bs4 import BeautifulSoup
 import os
+import argparse
 
 from langchain_core.documents import Document
 
@@ -273,5 +274,22 @@ def deduplicate_metadata():
         json.dump(deduplicated_metadata, deduplicated_metadata_file, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
-    reload_database(os.path.join(os.path.dirname(__file__), "html"))
-    # deduplicate_metadata()
+    # Create the parser
+    parser = argparse.ArgumentParser(description='A script that takes a mode and a filename as arguments.')
+
+    # Add arguments
+    parser.add_argument('mode', type=int, choices=[1, 2], help='Mode number (1 or 2)')
+    parser.add_argument('filename', type=str, help='Name of the file')
+
+    # Parse and validate the arguments
+    args = parser.parse_args()
+
+    # Use the arguments
+    if args.mode == 1:
+        # Reload the database
+        reload_database(os.path.join(os.path.dirname(__file__), "html"))
+    elif args.mode == 2:
+        # Deduplicate the metadata
+        deduplicate_metadata()
+    else:
+        print("Invalid mode number. Please enter 1 or 2.")
