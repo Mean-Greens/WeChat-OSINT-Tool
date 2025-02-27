@@ -22,6 +22,15 @@
   outline: none;
 }
 
+/*Font style for results page*/
+.formatted-text {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  font-size: inherit;
+  max-width: 60%;
+}
+
 .icon-wrapper {
   display: flex; /* Keep the icon wrapper flexible */
   align-items: center; /* Align the icon vertically */
