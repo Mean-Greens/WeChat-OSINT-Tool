@@ -123,6 +123,10 @@ def get_words_in_list(id):
 def home():
     return render_template("search.html")
 
+@app.route("/test")
+def test():
+    return render_template("test.html")
+
 #@app.route("/newword", methods=['GET', 'POST'])
 #def newword():
     #if  request.method == "GET":
