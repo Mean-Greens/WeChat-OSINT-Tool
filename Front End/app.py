@@ -147,6 +147,19 @@ def wordlist():
             add_word(new_word)
         return redirect(url_for("wordlist"))  # Redirect to avoid form resubmission
 
+@app.route("/test_wordlist", methods=['GET', 'POST'])
+def test_wordlist():
+    if request.method == "GET":
+        words = load_words()
+        combined_list = []
+        for i in range(0, len(words) - 1, 2):
+            combined_list.append(words[i] + ', ' + words[i + 1])
+        return render_template("test_wordlist.html", words=combined_list)
+    elif request.method == "POST":
+        new_word = request.form.get("new_word", "").strip()
+        if new_word:  # Only add non-empty words
+            add_word(new_word)
+        return redirect(url_for("test_wordlist"))  # Redirect to avoid form resubmission
 
 @app.route("/results")
 def results():
