@@ -18,15 +18,15 @@
                     <div class="flex justify-between h-16">
                         <div class="flex space-x-8">
                             <img src="{{ url_for('static', filename='meangreens.png') }}" id=logo alt="Mean Greens" />
-                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-blue-600 bg-blue-50"
-                                href="/" aria-current="page"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="{{ url_for('test') }}" aria-current="page">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round"
                                 class="lucide lucide-message-square w-5 h-5 mr-2">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                 </svg>Query LLM
-                            </a>
-                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="/wordlist">
+                            </a> 
+                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="{{ url_for('test_wordlist') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round"
@@ -45,9 +45,7 @@
             </nav>
             <main class="py-8">
                 <div class="max-w-4xl mx-auto p-6">
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        {% block content %} {% endblock %}
-                    </div>
+                    {% block content %} {% endblock %}
                 </div>
             </main>
         </div>
