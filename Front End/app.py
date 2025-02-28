@@ -165,6 +165,10 @@ def test_wordlist():
 def results():
     return render_template("results.html")
  
+@app.route("/test_results")
+def test_results():
+    return render_template("test_results.html")
+ 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     if request.method == "GET":
@@ -174,9 +178,16 @@ def search():
         search_term = request.form['search_term']
         results = query(search_term)
         return render_template('results.html', results=results)
-        
-    
 
+@app.route("/test_search", methods=['GET', 'POST'])
+def test_search():
+    if request.method == "GET":
+        return render_template('test.html')
+    #once they search
+    elif request.method == "POST":
+        search_term = request.form['search_term']
+        results = query(search_term)
+        return render_template('test_results.html', results=results)
 
 @app.route("/list", methods=["GET"])
 def retrieve_lists():
