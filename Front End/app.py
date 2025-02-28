@@ -121,7 +121,7 @@ def get_words_in_list(id):
 # ------------------------ BEGIN ROUTES ------------------------ #
 @app.route("/")
 def home():
-    return render_template("search.html")
+    return render_template("test_search.html")
 
 @app.route("/test")
 def test():
