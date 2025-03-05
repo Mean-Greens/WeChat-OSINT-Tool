@@ -119,11 +119,11 @@ def get_words_in_list(id):
     return result
 
 # ------------------------ BEGIN ROUTES ------------------------ #
-@app.route("/")
-def home():
-    return render_template("test_search.html")
+# @app.route("/")
+# def home():
+#     return render_template("test_search.html")
 
-@app.route("/test")
+@app.route("/")
 def test():
     return render_template("test.html")
 
@@ -136,18 +136,18 @@ def test():
         #results = get_results(word)
         #return render_template("wordlist.html")
 
-@app.route("/wordlist", methods=['GET', 'POST'])
-def wordlist():
-    if request.method == "GET":
-        words = load_words()
-        return render_template("wordlist.html", words=words)
-    elif request.method == "POST":
-        new_word = request.form.get("new_word", "").strip()
-        if new_word:  # Only add non-empty words
-            add_word(new_word)
-        return redirect(url_for("wordlist"))  # Redirect to avoid form resubmission
+# @app.route("/wordlist", methods=['GET', 'POST'])
+# def wordlist():
+#     if request.method == "GET":
+#         words = load_words()
+#         return render_template("wordlist.html", words=words)
+#     elif request.method == "POST":
+#         new_word = request.form.get("new_word", "").strip()
+#         if new_word:  # Only add non-empty words
+#             add_word(new_word)
+#         return redirect(url_for("wordlist"))  # Redirect to avoid form resubmission
 
-@app.route("/test_wordlist", methods=['GET', 'POST'])
+@app.route("/wordlist", methods=['GET', 'POST'])
 def test_wordlist():
     if request.method == "GET":
         words = load_words()
@@ -161,25 +161,25 @@ def test_wordlist():
             add_word(new_word)
         return redirect(url_for("test_wordlist"))  # Redirect to avoid form resubmission
 
-@app.route("/results")
-def results():
-    return render_template("results.html")
+# @app.route("/results")
+# def results():
+#     return render_template("results.html")
  
-@app.route("/test_results")
+@app.route("/results")
 def test_results():
     return render_template("test_results.html")
  
-@app.route("/search", methods=['GET', 'POST'])
-def search():
-    if request.method == "GET":
-        return render_template('search.html')
-    #once they search
-    elif request.method == "POST":
-        search_term = request.form['search_term']
-        results = query(search_term)
-        return render_template('results.html', results=results)
+# @app.route("/search", methods=['GET', 'POST'])
+# def search():
+#     if request.method == "GET":
+#         return render_template('search.html')
+#     #once they search
+#     elif request.method == "POST":
+#         search_term = request.form['search_term']
+#         results = query(search_term)
+#         return render_template('results.html', results=Markup(results))
 
-@app.route("/test_search", methods=['GET', 'POST'])
+@app.route("/search", methods=['GET', 'POST'])
 def test_search():
     if request.method == "GET":
         return render_template('test.html')
@@ -187,7 +187,7 @@ def test_search():
     elif request.method == "POST":
         search_term = request.form['search_term']
         results = query(search_term)
-        return render_template('test_results.html', results=results)
+        return render_template('test_results.html', results=Markup(results))
 
 @app.route("/list", methods=["GET"])
 def retrieve_lists():
