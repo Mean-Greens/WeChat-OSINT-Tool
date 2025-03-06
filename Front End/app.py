@@ -187,7 +187,9 @@ def test_search():
     elif request.method == "POST":
         search_term = request.form['search_term']
         results = query(search_term)
-        return render_template('test_results.html', results=Markup(results))
+        html_results = markdown.markdown(results)
+        results = Markup(html_results)
+        return render_template('test_results.html', results=results)
 
 @app.route("/list", methods=["GET"])
 def retrieve_lists():
@@ -208,7 +210,9 @@ def retrieve_lists():
 @app.route("/doc")
 def doc():
     md_content = read_markdown_file(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md"))
-    return render_template("doc.html", content=Markup(md_content))
+    html_content = markdown.markdown(md_content)
+    content = Markup(html_content)
+    return render_template("doc.html", content=content)
 
 @app.errorhandler(404)
 def not_found(e):
