@@ -1,5 +1,6 @@
 import os
-from flask import Flask, session, render_template, request, redirect, url_for, flash #CSRFProtect
+from pathlib import Path
+from flask import Flask, session, render_template, request, redirect, url_for, flash, send_from_directory #CSRFProtect
 from dotenv import load_dotenv
 import psycopg2
 import hashlib
@@ -161,6 +162,16 @@ def test_wordlist():
             add_word(new_word)
         return redirect(url_for("test_wordlist"))  # Redirect to avoid form resubmission
 
+@app.route("/articles", methods=['GET'])
+def articles():
+    if request.method == "GET":
+        files = os.listdir(Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/')))
+        return render_template("articles.html", files=files)
+    
+@app.route("/articles/<path:filename>")
+def serve_article(filename):
+    return send_from_directory(Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/')), filename)
+
 # @app.route("/results")
 # def results():
 #     return render_template("results.html")
@@ -189,6 +200,7 @@ def test_search():
         results = query(search_term)
         html_results = markdown.markdown(results)
         results = Markup(html_results)
+        print(results)
         return render_template('test_results.html', results=results)
 
 @app.route("/list", methods=["GET"])
