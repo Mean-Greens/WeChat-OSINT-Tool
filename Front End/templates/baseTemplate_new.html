@@ -1,0 +1,61 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='meangreens.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+    <!-- <script type="module" crossorigin="" src="/static/js/index-DuHeQvw6.js"></script> -->
+    <link rel="stylesheet" crossorigin="" href="{{ url_for('static', filename='css/index-BK42u_aM.css') }}">
+    <!-- <link rel="stylesheet" crossorigin="" href="{{ url_for('static', filename='css/style.css') }}"> -->
+</head>
+
+<body>
+    <div id="root">
+        <div class="min-h-screen bg-gray-100">
+            <nav class="bg-white shadow-md">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex justify-between h-16">
+                        <div class="flex space-x-8">
+                            <img src="{{ url_for('static', filename='meangreens.png') }}" id=logo alt="Mean Greens" />
+                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="{{ url_for('test') }}" aria-current="page">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-message-square w-5 h-5 mr-2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>Query LLM
+                            </a> 
+                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="{{ url_for('test_wordlist') }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-list w-5 h-5 mr-2">
+                                <line x1="8" x2="21" y1="6" y2="6"></line>
+                                <line x1="8" x2="21" y1="12" y2="12"></line>
+                                <line x1="8" x2="21" y1="18" y2="18"></line>
+                                <line x1="3" x2="3.01" y1="6" y2="6"></line>
+                                <line x1="3" x2="3.01" y1="12" y2="12"></line>
+                                <line x1="3" x2="3.01" y1="18" y2="18"></line>
+                                </svg>Word List
+                            </a>
+                            <a class="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="{{ url_for('doc') }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-marked">
+                                <path d="M10 2v8l3-3 3 3V2"/>
+                                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+                                </svg>Documentation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <main class="py-8">
+                <div class="max-w-4xl mx-auto p-6">
+                    {% block content %} {% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,39 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'baseTemplate_new.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search</title>
-    <link rel="stylesheet" href="static/css/style.css">
-</head>
-<header>
-    <nav>
-        <div class="logo">
-            <img src="static/meangreens.png" id=logo alt="Mean Greens" />
-        </div>
-        <ul class="navbar">
-            <!--<img src="meangreens.png" id=logo alt="Mean Greens" />-->
-            <li><a href="/search">Search</a></li> 
-            <li><a href="/doc">Documentation</a></li>
-            <li><a href="/wordlist">Wordlist</a></li> 
-            <li class="has-dropdown">
-                <a href="/login">Login</a>
-                <ul>
-                    <li><a href="/list">My Wordlists</a></li>
-                    <li><a href="/logout"><a>Logout</a></li>
-                </ul>
-            </li> 
-        </ul>
-    </nav>
-</header>
-<body>
-    <h1>Documentation</h1>
-        <p>
+{% block title %}Documentation{% endblock %}
+
+{% block content %}
+<!-- <div class="bg-white rounded-lg shadow-lg p-6"> -->
+    <!-- <h1>Documentation</h1>
+    <p>
+        {{ content|safe }}
+    </p>
+    <img src="static/meangreens.png" id=logo alt="Mean Greens" />
+    <img src="static/backup_meangreens.jpg" id=logo alt="Mean Greens Alternate" /> -->
+<!-- </div> -->
+
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Documentation</h1>
+    <div style="display: flex; justify-content: center; align-items: center; padding: 20px; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-all;">
+        <pre style = "white-space: pre-wrap; overflow-wrap: normal; word-break: normal;" class="formatted-text">
             {{ content|safe }}
-        </p>
-        <img src="static/meangreens.png" id=logo alt="Mean Greens" />
-        <img src="static/backup_meangreens.jpg" id=logo alt="Mean Greens Alternate" />
-</body>
-
-</html>
+            <img src="static/meangreens.png" id=logo alt="Mean Greens" />
+            <!-- <img src="static/backup_meangreens.jpg" id=logo alt="Mean Greens Alternate" /> -->
+        </pre>
+    </div>
+</div>
+{% endblock %}

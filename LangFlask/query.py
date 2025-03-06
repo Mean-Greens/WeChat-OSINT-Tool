@@ -20,6 +20,26 @@ LLM_MODEL = os.getenv('LLM_MODEL', 'aya-expanse:32b')
 # Function to get the prompt templates for generating alternative questions and answering based on context
 # This gives the LLM a kind of base behavior to work off of. 
 def get_prompt():
+    """
+    Generates two different prompt templates for language processing tasks.
+
+    Returns:
+        tuple: A tuple containing two prompt templates:
+            - QUERY_PROMPT (PromptTemplate): A template designed to translate a given 
+              user question into Traditional Chinese and generate five different 
+              variations of the question. These variations help retrieve relevant 
+              documents from a WeChat article vector database.
+            - prompt (ChatPromptTemplate): A template designed for OSINT (Open-Source 
+              Intelligence) tasks. It ensures responses are provided strictly in English 
+              using only the given context. If no relevant information is found in the 
+              context, it returns five recommended search terms.
+
+    The function defines two templates:
+        1. QUERY_PROMPT: Helps generate multiple variations of a question in 
+           Traditional Chinese for better document retrieval.
+        2. prompt: An OSINT-focused template that ensures strict adherence to provided 
+           context and prevents speculation or external knowledge use.
+    """
     QUERY_PROMPT = PromptTemplate(
         input_variables=["question"],
         template="""You are an AI language model assistant. Your task is to tanslate the given user question below into Traditional Chinese and generate five
@@ -58,6 +78,31 @@ def get_prompt():
 
 # Main function to handle the query process
 def query(input):
+    """
+    Processes a given input query by translating it, retrieving relevant documents 
+    from a vector database, and generating a response using a language model.
+
+    Args:
+        input (str): The user's query.
+
+    Returns:
+        str: The generated response along with retrieved document sources, or None if no input is provided.
+
+    Functionality:
+        - Initializes the language model ('aya-expanse:32b') using Ollama.
+        - Retrieves a chunked vector database instance.
+        - Fetches prompt templates for query processing.
+        - Translates the input query into the appropriate language.
+        - Retrieves relevant documents using the vector database retriever.
+        - Constructs a processing chain to generate a response based on retrieved context.
+        - Extracts metadata (title, author, date, hash) from retrieved documents.
+        - Returns the AI-generated response along with document sources.
+
+    Note:
+        - Uses a global `sources` variable to store and format metadata of retrieved documents.
+        - The `print_docs` function formats and prints document metadata.
+        - Some commented-out code suggests alternative implementations for retrieval.
+    """
 
     if input:
         # Initialize the language model with the specified model name
@@ -120,6 +165,24 @@ def query(input):
 
 
 def timeConvert(unix_timestamp): 
+    """
+    Converts a Unix timestamp to a human-readable datetime string.
+
+    Args:
+        unix_timestamp (int or str): The Unix timestamp to convert.
+
+    Returns:
+        str: The formatted datetime string in the format 'YYYY-MM-DD HH:MM:S'.
+
+    Functionality:
+        - Converts the Unix timestamp into a `datetime` object.
+        - Formats the datetime object into a string representation.
+
+    Note:
+        - The function assumes the timestamp is in seconds.
+        - The input can be an integer or a string that represents an integer.
+    """
+
     # Convert the Unix timestamp to a datetime object 
     dt = datetime.datetime.fromtimestamp(int(unix_timestamp)) 
     # Format the datetime object as a string 
@@ -127,7 +190,23 @@ def timeConvert(unix_timestamp):
 
 # Main function to handle the query translation process. 
 def query_translation(input):
+    """
+    Translates a given word or phrase into Simplified Chinese using a language model.
 
+    Args:
+        input (str): The word or phrase to be translated.
+
+    Returns:
+        str: The translated text in Simplified Chinese, or None if no input is provided.
+
+    Functionality:
+        - Initializes the language model ('aya-expanse:32b') using Ollama.
+        - Sends a prompt to the model requesting a Simplified Chinese translation.
+        - Extracts and returns only the translated text from the model's response.
+
+    Note:
+        - Ensures the response contains only the translation with no extra text.
+    """
     if input:
         # Initialize the language model with the specified model name
         llm = ChatOllama(model=LLM_MODEL)
