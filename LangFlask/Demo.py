@@ -348,7 +348,7 @@ def scrape():
 if __name__ == "__main__":
     try:
         scrape()
-    except (httpx.RequestError, httpx.ConnectError, httpx.ProxyError, httpx.ReadTimeout) as e1:
+    except (httpx.RequestError, httpx.ConnectError, httpx.ProxyError, httpx.ReadTimeout, httpx.ConnectTimeout, httpx.HTTPStatusError) as e1:
         logging.error(e1)
 
         # Generate a random time between 15 and 20 minutes (in seconds)
