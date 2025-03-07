@@ -1,5 +1,3 @@
-# Need documentation for this file
-
 # This file contains a hardcoded cookies which are required to bypass Sogou bot detection.
 # We will attempt automatic creation/retrieval of this cookie later.
 #
@@ -25,9 +23,10 @@ from rich.traceback import install
 from pathlib import Path
 from collections import OrderedDict
 
+# From rich.traceback this shows errors in a cleaner more readable way
 install(show_locals=True)
 
-# Creates a log file for the Wechat web
+# Creates a log file for the Wechat web scraper
 log_file_path = os.path.join(os.path.dirname(__file__), 'Wechat_Scraper.log')
 logging.basicConfig(
     filename=log_file_path,
@@ -61,8 +60,8 @@ HEADERS = {
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
 BASE_URL_2 = '&ie=utf8'
 
-QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
-SEARCH_TERM = '香蕉布丁' # Banana pudding
+# QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
+# SEARCH_TERM = '香蕉布丁' # Banana pudding
 
 from constants import FORCE_WORDLIST_RESTART
 
@@ -76,8 +75,28 @@ from constants import FORCE_WORDLIST_RESTART
 
 #collection = client.get_or_create_collection(name="demo")
 
-# Timer decorator
 def timer(func):
+    """
+    A decorator that measures and logs the execution time of a function.
+
+    The decorator calculates the time taken for a wrapped function to execute and
+    formats the duration into hours, minutes, and seconds. It prints the elapsed time
+    to the console and logs it using the logging module.
+
+    Args:
+        func (callable): The function to be decorated.
+
+    Returns:
+        callable: The wrapped function with execution time measurement functionality.
+
+    Example:
+        @timer
+        def my_function():
+            # Function code here...
+
+        my_function()
+        # Output: --- 0 hours, 0 minutes, 0.05 seconds ---
+    """
     def wrapper(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)
@@ -101,9 +120,30 @@ def force_wordlist():
     FORCE_WORDLIST_RESTART = True
     return
 
-# Reads througn wordlist.txt. It takes every other word starting with the second word to only do 
-# searches with the Chinese terms. 
 def read_search_terms():
+    """
+    Reads a list of search terms from 'Wordlist.txt' and filters them to include every 
+    other term starting with the second one, focusing on Chinese terms.
+
+    The function removes any blank lines from the file, strips whitespace from each term,
+    selects every second term starting with the second one, and eliminates duplicates 
+    while preserving the order.
+
+    Returns:
+        list: A list of unique Chinese search terms extracted from 'Wordlist.txt'.
+
+    Example:
+        # Assuming 'Wordlist.txt' contains:
+        # apple
+        # 苹果
+        # banana
+        # 香蕉
+        # orange
+        # 橙子
+
+        result = read_search_terms()
+        # Output: ['苹果', '香蕉', '橙子']
+    """
     with open('Wordlist.txt', 'r', encoding='utf-8') as f:
         search_terms = f.readlines()
         for i, term in enumerate(search_terms):
@@ -119,9 +159,37 @@ def timeConvert(unix_timestamp):
     # Format the datetime object as a string 
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
-#Gets the HTML at the specified url
-#It will attempt to get the HTML 5 times with a two minute wait between each attempt
 def get_html(url, retries=5, wait_time=120):
+    """
+    Fetches the HTML content of the specified URL with retry logic for handling timeouts.
+
+    The function attempts to retrieve the HTML content of the given URL up to a specified 
+    number of retries. If a timeout occurs, it waits for a specified duration before retrying. 
+    Logs are generated for timeout occurrences, non-200 HTTP responses, and critical failures 
+    if the maximum number of retries is exceeded. The HTML content and a parsed BeautifulSoup 
+    object are returned.
+
+    Args:
+        url (str): The URL to fetch the HTML content from.
+        retries (int, optional): The maximum number of retry attempts in case of a ReadTimeout. 
+                                 Defaults to 5.
+        wait_time (int, optional): The wait time in seconds between retry attempts. Defaults to 120.
+
+    Returns:
+        tuple: A tuple containing:
+               - content (bytes): The raw HTML content of the response.
+               - soup (BeautifulSoup): A BeautifulSoup object for parsing the HTML content.
+
+    Raises:
+        Exception: Raised if the function fails to fetch the URL after the maximum number of retries.
+
+    Example:
+        try:
+            content, soup = get_html("https://example.com")
+            print(soup.title.string)
+        except Exception as e:
+            print("Failed to fetch the URL:", e)
+    """
     with httpx.Client() as client:
         attempt = 0
         while attempt < retries:
@@ -144,8 +212,32 @@ def get_html(url, retries=5, wait_time=120):
         
         return response.content, BeautifulSoup(response.text, 'html.parser')
 
-# Gets to wechat link to the found article
 def get_wechat_link(url):
+    """
+    Retrieves the WeChat link from the specified URL.
+
+    The function sends a GET request to the specified URL using the httpx library. It handles
+    different HTTP response status codes:
+    - If the status code is 302, it logs an error indicating that access has been blocked and
+      returns None.
+    - If the status code is 200, it searches for and reconstructs the WeChat link using a 
+      regular expression pattern found in the HTML response.
+    - If the response code is anything else, it logs an error and returns None.
+
+    Args:
+        url (str): The URL to fetch and parse for the WeChat link.
+
+    Returns:
+        str or None: The extracted WeChat link as a string if found, or None if the link cannot
+        be retrieved.
+
+    Example:
+        wechat_link = get_wechat_link("https://example.com")
+        if wechat_link:
+            print("WeChat Link:", wechat_link)
+        else:
+            print("Failed to retrieve WeChat link.")
+    """
     with httpx.Client() as client:
         
         response = client.get(url, headers=HEADERS)
@@ -216,8 +308,44 @@ def read_website(url, retries=5, wait_time=120):
             logging.error("Failed to retrieve the website")
             return None
 
-#Main search function. Calls many of the functions above. 
 def sogou_searcher(query):
+    """
+    Performs a Sogou search using the provided query and retrieves the search results.
+
+    The function sends a GET request to the Sogou search engine, extracts relevant information
+    (e.g., title, description, author, date, and source link) from the search results, and
+    processes the links to WeChat articles. The content and metadata for each retrieved article
+    are packaged into documents for further use.
+
+    Args:
+        query (str): The search keyword or term to query on Sogou.
+
+    Returns:
+        list: A list of documents where each document consists of:
+              - Document for the raw webpage content.
+              - Document for the normalized text content, each with associated metadata.
+
+    Metadata Keys:
+        - source (str): The source URL of the WeChat article.
+        - title (str): The title of the article.
+        - description (str): A brief description of the article.
+        - author (str): The author of the article.
+        - date (str): The publication date of the article in timestamp format.
+        - hash (str): A SHA-256 hash of the normalized content for deduplication.
+        - keyword (str): The search keyword used for querying.
+
+    Raises:
+        None directly. Logs warnings or errors when no results are found or if an issue occurs
+        during processing.
+
+    Example:
+        query = "example query"
+        documents = sogou_searcher(query)
+        if documents:
+            print(f"Retrieved {len(documents)} documents.")
+        else:
+            print("No documents were retrieved.")
+    """
 
     documents = []
     print(query)
@@ -278,8 +406,36 @@ def sogou_searcher(query):
 
     return documents
 
-# store each document in a vector embedding database
 def store_websites(documents:list):
+    """
+    Stores each document into a vector embedding database for further use and analysis.
+
+    The function checks if a document already exists in the vector database by comparing its
+    hash. If the document does not exist, it adds only its metadata to save storage space, 
+    chunks the document for better compatibility with large language models (LLMs), and stores
+    these chunks in a separate chunked collection. Additionally, the function saves the HTML
+    content of each document as a file in an 'Articles' folder on the desktop.
+
+    Args:
+        documents (list): A list of documents where each document consists of:
+            - doc[0]: An object containing metadata (e.g., hash and other information).
+            - doc[1]: The content of the document to be chunked and stored.
+
+    Returns:
+        None
+
+    Side Effects:
+        - Logs messages to indicate the status of document storage.
+        - Writes HTML content files to the 'Articles' folder on the desktop.
+        - Updates vector embedding databases with document metadata and chunks.
+
+    Example:
+        documents = [
+            (Document(page_content="<html>...</html>", metadata={"hash": "123abc"}), chunked_doc)
+        ]
+        store_websites(documents)
+        # Adds metadata and chunks to the database, and saves the HTML file locally.
+    """
     db = get_vector_db()
 
     # Chunk documents and store in a seperate collection that the LLM will use
@@ -316,8 +472,33 @@ def main(search_term):
     documents = sogou_searcher(search_term)
     store_websites(documents)
 
-#Main function for scraping through our wordlist.
 def scrape():
+    """
+    Main function for scraping data from a wordlist.
+
+    This function iterates over a list of search queries, obtained from `read_search_terms()`,
+    and processes each query by calling the `main()` function. If the `FORCE_WORDLIST_RESTART` 
+    global flag is set, the function resets the flag and refreshes the wordlist. In case of a 
+    `httpx.ConnectError`, the error is logged, and the function continues with the next query. 
+    After processing each query, the function waits for a random time between 15 and 20 minutes 
+    before proceeding to the next one.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Side Effects:
+        - Continuously runs in a loop until interrupted.
+        - Reads and processes search queries from a wordlist.
+        - Logs any connection errors or sleep intervals.
+        - Waits for a random interval after each query.
+
+    Example:
+        # Call the scrape function to start processing queries:
+        scrape()
+    """
     global FORCE_WORDLIST_RESTART
     while True:
             # This refreshes the wordlist after all terms are scraped
