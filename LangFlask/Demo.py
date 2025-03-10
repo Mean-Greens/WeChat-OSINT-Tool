@@ -22,6 +22,7 @@ import logging
 from rich.traceback import install
 from pathlib import Path
 from collections import OrderedDict
+from constants import set_shared_variable, get_shared_variable
 
 # From rich.traceback this shows errors in a cleaner more readable way
 install(show_locals=False)
@@ -62,8 +63,6 @@ BASE_URL_2 = '&ie=utf8'
 
 # QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
 # SEARCH_TERM = '香蕉布丁' # Banana pudding
-
-from constants import FORCE_WORDLIST_RESTART
 
 # Get the directory path of the current file
 #current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -505,8 +504,10 @@ def scrape():
             queries = read_search_terms()
 
             for query in reversed(queries):
-                if FORCE_WORDLIST_RESTART:
-                    FORCE_WORDLIST_RESTART = False
+                if get_shared_variable():
+                    set_shared_variable(False)
+                    # Generate a random time between 15 and 20 minutes (in seconds)
+                    random_sleep_time = random.uniform(15 * 60, 20 * 60)
                     break
                 
                 try:

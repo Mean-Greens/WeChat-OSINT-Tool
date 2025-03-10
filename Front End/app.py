@@ -11,7 +11,7 @@ import markdown
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from LangFlask.query import query, query_translation
-from LangFlask.constants import FORCE_WORDLIST_RESTART
+from LangFlask.constants import set_shared_variable, get_shared_variable
 
 load_dotenv()
 
@@ -369,8 +369,7 @@ def hash_password(password, salt=None):
 # This function forces the new wordlist to run
 @app.route('/force-run', methods=['POST'])
 def force_run_endpoint():
-    global FORCE_WORDLIST_RESTART
-    FORCE_WORDLIST_RESTART = True
+    set_shared_variable(True)
     return "Forced new wordlist to run"
 
 # @app.route("/shelf/list/<id>", methods=['GET'])
