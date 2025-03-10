@@ -24,7 +24,7 @@ from pathlib import Path
 from collections import OrderedDict
 
 # From rich.traceback this shows errors in a cleaner more readable way
-install(show_locals=True)
+install(show_locals=False)
 
 # Creates a log file for the Wechat web scraper
 log_file_path = os.path.join(os.path.dirname(__file__), 'Wechat_Scraper.log')
@@ -238,7 +238,7 @@ def get_wechat_link(url):
         else:
             print("Failed to retrieve WeChat link.")
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=httpx.Timeout(60.0)) as client:
         
         response = client.get(url, headers=HEADERS)
         if response.status_code == 302:
