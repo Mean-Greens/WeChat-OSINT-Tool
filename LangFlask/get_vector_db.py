@@ -17,6 +17,19 @@ TEXT_EMBEDDING_MODEL = os.getenv('TEXT_EMBEDDING_MODEL', 'shaw/dmeta-embedding-z
 
 #This function gets the DB for future use
 def get_vector_db():
+    """
+    Initializes and returns a Chroma vector database instance.
+
+    This function creates an instance of `Chroma` with the specified collection name and 
+    persistence directory. It also initializes the `OllamaEmbeddings` model `shaw/dmeta-embedding-zh` for embedding 
+    text data.
+
+    Returns:
+        Chroma: A Chroma vector database instance configured with the specified settings.
+
+    Raises:
+        Exception: If there is an issue initializing the embedding model or database.
+    """
     embedding = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL)
 
     db = Chroma(
@@ -29,6 +42,19 @@ def get_vector_db():
 
 #This function gets the chunked DB for future use
 def get_chunked_db():
+    """
+    Initializes and returns a Chroma vector database instance for chunked data.
+
+    This function sets up a `Chroma` database using the specified collection name 
+    for chunked data storage. It also initializes the `OllamaEmbeddings` model `shaw/dmeta-embedding-zh` to 
+    generate text embeddings.
+
+    Returns:
+        Chroma: A Chroma vector database instance configured for chunked data.
+
+    Raises:
+        Exception: If there is an issue initializing the embedding model or database.
+    """
     embedding = OllamaEmbeddings(model=TEXT_EMBEDDING_MODEL)
 
     db = Chroma(
