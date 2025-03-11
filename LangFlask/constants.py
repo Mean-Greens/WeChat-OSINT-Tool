@@ -6,7 +6,7 @@ FILE_PATH = "constants.json"
 
 # Initialize the file with a default value
 def initialize_file():
-    with open(FILE_PATH, "w") as f:
+    with open(f"{os.path.dirname(os.path.abspath(__file__))}/{FILE_PATH}", "w") as f:
         json.dump({"restart_wordlist": False}, f)
 
 # Get the current value of the shared variable
