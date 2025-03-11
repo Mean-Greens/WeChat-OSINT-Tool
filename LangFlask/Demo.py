@@ -22,7 +22,7 @@ import logging
 from rich.traceback import install
 from pathlib import Path
 from collections import OrderedDict
-from constants import set_shared_variable, get_shared_variable
+from constants import set_shared_variable, get_shared_variable, initialize_file
 
 # From rich.traceback this shows errors in a cleaner more readable way
 install(show_locals=False)
@@ -60,19 +60,6 @@ HEADERS = {
 
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
 BASE_URL_2 = '&ie=utf8'
-
-# QUESTION = '哪种香蕉布丁最好吃？' # Which banana pudding is best?
-# SEARCH_TERM = '香蕉布丁' # Banana pudding
-
-# Get the directory path of the current file
-#current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Add the 'db' folder to the directory path
-#db_path = os.path.join(current_dir, 'db')
-
-#client = chromadb.PersistentClient(path=db_path)
-
-#collection = client.get_or_create_collection(name="demo")
 
 def timer(func):
     """
@@ -113,11 +100,6 @@ def timer(func):
         logging.info(elapsed_time)
         return result
     return wrapper
-
-def force_wordlist():
-    global FORCE_WORDLIST_RESTART
-    FORCE_WORDLIST_RESTART = True
-    return
 
 def read_search_terms():
     """
@@ -498,7 +480,6 @@ def scrape():
         # Call the scrape function to start processing queries:
         scrape()
     """
-    global FORCE_WORDLIST_RESTART
     while True:
             # This refreshes the wordlist after all terms are scraped
             queries = read_search_terms()
@@ -526,6 +507,7 @@ def scrape():
                 logging.info(f"Slept for {random_sleep_time / 60:.2f} minutes.")
 
 if __name__ == "__main__":
+    initialize_file()
     try:
         scrape()
     except (httpx.RequestError, httpx.ConnectError, httpx.ProxyError, httpx.ReadTimeout, httpx.ConnectTimeout, httpx.HTTPStatusError) as e1:
