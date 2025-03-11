@@ -370,7 +370,7 @@ def hash_password(password, salt=None):
 @app.route('/force-run', methods=['POST'])
 def force_run_endpoint():
     set_shared_variable(True)
-    return "Forced new wordlist to run"
+    return redirect(url_for("test_wordlist"))
 
 # @app.route("/shelf/list/<id>", methods=['GET'])
 # # FIXME only allow to work for logged in user w/ try catch
