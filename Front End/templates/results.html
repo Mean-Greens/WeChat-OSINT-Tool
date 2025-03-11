@@ -28,7 +28,7 @@
     </nav>
 </header>
 <body>
-    <form action="/search" method="POST">
+    <form action="{{ url_for('test_search') }}" method="POST">
         <div class="search-section">
             <input type="text" name="search_term" class="search-bar" placeholder="Search...">
             <button type="submit">Search</button>
