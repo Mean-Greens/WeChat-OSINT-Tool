@@ -39,11 +39,13 @@ app.secret_key = os.getenv("SECRET")
 #     if 'userid' not in session:
 #         return redirect(url_for('login'))
 
+# Read a markdown file and convert its content to HTML
 def read_markdown_file(file_path):
     with open(file_path, 'r') as f:
         content = f.read()
     return markdown.markdown(content)
 
+# Establish and return a connection to the database
 def get_db_connection():
    conn = psycopg2.connect(
        host=os.getenv("DB_HOST"),
@@ -53,6 +55,7 @@ def get_db_connection():
    )
    return conn
 
+# Render the index page and apply filters if provided
 def index():
     filters = {}
     if request.method == "POST":
@@ -81,6 +84,7 @@ def add_word(new_word):
         if chinese_word:
             file.write(chinese_word + "\n")
 
+# Retrieve user-specific lists from the database
 def get_user_lists():
      # Create a new database connection for each request
     conn = get_db_connection()  # Create a new database connection
@@ -124,6 +128,7 @@ def get_words_in_list(id):
 # def home():
 #     return render_template("test_search.html")
 
+# Render the test page
 @app.route("/")
 def test():
     return render_template("test.html")
@@ -150,6 +155,19 @@ def test():
 
 @app.route("/wordlist", methods=['GET', 'POST'])
 def test_wordlist():
+    """
+    Handle word list requests.
+
+
+    This function processes both GET and POST methods:
+    - On GET: Loads and displays a formatted list of words.
+    - On POST: Adds a new word to the list and redirects back to the list page.
+
+
+    Returns:
+       Response: A rendered HTML template with the word list or a redirect after adding a new word.
+
+    """
     if request.method == "GET":
         words = load_words()
         combined_list = []
@@ -162,12 +180,14 @@ def test_wordlist():
             add_word(new_word)
         return redirect(url_for("test_wordlist"))  # Redirect to avoid form resubmission
 
+# Display a list of article files
 @app.route("/articles", methods=['GET'])
 def articles():
     if request.method == "GET":
         files = os.listdir(Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/')))
         return render_template("articles.html", files=files)
-    
+
+# Serve an article file from the Articles directory
 @app.route("/articles/<path:filename>")
 def serve_article(filename):
     return send_from_directory(Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/')), filename)
@@ -175,7 +195,8 @@ def serve_article(filename):
 # @app.route("/results")
 # def results():
 #     return render_template("results.html")
- 
+
+# Render the test results page
 @app.route("/results")
 def test_results():
     return render_template("test_results.html")
@@ -192,6 +213,18 @@ def test_results():
 
 @app.route("/search", methods=['GET', 'POST'])
 def test_search():
+    """
+    Handle search requests.
+
+
+    This function processes search requests using both GET and POST methods.
+    - On GET: Renders the search page.
+    - On POST: Processes the search term and returns formatted results.
+
+
+    Returns:
+       Response: A rendered HTML template with search results or an empty search page.
+    """
     if request.method == "GET":
         return render_template('test.html')
     #once they search
@@ -203,6 +236,7 @@ def test_search():
         print(results)
         return render_template('test_results.html', results=results)
 
+# Retrieve and display user-specific lists
 @app.route("/list", methods=["GET"])
 def retrieve_lists():
     lists = get_user_lists() # Call defined function to get all items
@@ -219,6 +253,7 @@ def retrieve_lists():
         #return render_template('results.html', results=results)
         #return render_template('results.html')
 
+# Render documentation from a markdown file
 @app.route("/doc")
 def doc():
     md_content = read_markdown_file(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md"))
@@ -226,6 +261,7 @@ def doc():
     content = Markup(html_content)
     return render_template("doc.html", content=content)
 
+# Handle 404 errors (Page Not Found)
 @app.errorhandler(404)
 def not_found(e):
     return "Page not found. Please check the URL.", 404
@@ -239,6 +275,54 @@ def login_exempt(f):
 @app.route('/login', methods=['GET', 'POST'])
 @login_exempt
 def login():
+    """
+    Handle user login.
+
+
+    This function processes user login requests using both GET and POST methods.
+    - On GET: Renders the login page.
+    - On POST: Handles authentication by verifying the provided username and password
+    against stored values in the database.
+
+
+    If authentication is successful, the user is logged in and redirected to the home page.
+    If authentication fails, an error message is displayed.
+
+
+    Returns:
+        Response: A redirect to the home page if login is successful.
+                A rendered login page with an error message if login fails.
+
+
+    Raises:
+        Exception: If a database or connection error occurs during login.
+
+
+    GET:
+        Renders the `login.html` template.
+
+
+    POST:
+        Processes the following form data:
+            - username (str): The user's username.
+            - password (str): The user's password.
+
+
+       Workflow:
+           1. Fetch the hashed password and salt from the database based on the username.
+           2. Verify the provided password using the stored salt and hash.
+           3. If verification succeeds:
+               - Store user data (username, user ID, email) in the session.
+               - Redirect to the home page.
+           4. If verification fails:
+               - Display an error message using `flash`.
+               - Return the `login.html` template.
+
+
+       If login fails:
+           - Displays an error message using `flash`.
+           - Returns the `login.html` template.
+    """
     # If user is signed in, redirect them to home
     if 'userid' in session:
         return redirect(url_for('home'))
@@ -309,6 +393,52 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 @login_exempt
 def register():
+    """
+    Handle user registration.
+
+
+   This function processes user registration requests, handling both GET and POST methods.
+   - On GET: Renders the registration page.
+   - On POST: Handles form submission, validates input, hashes the password, and inserts the new user into the database.
+
+
+   If registration is successful, the user is logged in and redirected to the home page. 
+   If an error occurs during registration, an error message is displayed.
+
+
+   Returns:
+       Response: A redirect to the home page if registration is successful.
+                 A rendered registration page with an error message if registration fails.
+
+
+   Raises:
+       Exception: If a database error occurs during user creation.
+
+
+   GET:
+       Renders the `register.html` template.
+
+
+   POST:
+       Processes the following form data:
+           - email (str): The user's email address.
+           - username (str): The desired username.
+           - password (str): The desired password.
+           - confirm_password (str): Password confirmation.
+
+
+       Workflow:
+           1. Validates that passwords match.
+           2. Hashes the password.
+           3. Attempts to insert the user into the database.
+           4. Stores user data in the session if successful.
+           5. Redirects to the home page.
+
+
+       If registration fails:
+           - Displays an error message using `flash`.
+           - Returns the `register.html` template.
+    """
     # If user is signed in, send them to the index page
     if 'userid' in session:
         return redirect(url_for('home'))
