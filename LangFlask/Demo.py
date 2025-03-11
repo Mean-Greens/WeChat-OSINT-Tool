@@ -506,8 +506,6 @@ def scrape():
             for query in reversed(queries):
                 if get_shared_variable():
                     set_shared_variable(False)
-                    # Generate a random time between 15 and 20 minutes (in seconds)
-                    random_sleep_time = random.uniform(15 * 60, 20 * 60)
                     break
                 
                 try:
