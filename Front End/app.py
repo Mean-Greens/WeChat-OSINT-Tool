@@ -515,6 +515,5 @@ def force_run_endpoint():
 
 # ------------------------ END ROUTES ------------------------ #
 
-
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True, port=12345)
+    app.run(host='0.0.0.0', debug=False, port=12345)
