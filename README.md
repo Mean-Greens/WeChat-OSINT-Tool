@@ -39,7 +39,7 @@ cd Tool
 Navigate to the LangFlask directory and install the required packages. For this consider using a [python virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) so that packages on your system do not conflict with the packages that are needed to run this tool.
 
 ```shell
-cd LangFlask
+cd ./LangFlask
 pip install -r requirements.txt
 ```
 
@@ -67,14 +67,23 @@ or
 ollama pull gemma2:9b
 ```
 
+# Run the Scraper:
+
+Navigate to the LangFlask directory and run the Demo.py file:
+
+```shell
+cd ./LangFlask
+python Demo.py
+```
+
 # Run the Flask application:
 
 Navigate to the Front End directory and run the Flask app:
 
 ```shell
-cd ../Front\ End
+cd ./Front\ End
 python app.py
 ```
 
 
-The Flask application should now be running and accessible at http://localhost:8080.
+The Flask application should now be running and accessible at http://localhost:12345.
