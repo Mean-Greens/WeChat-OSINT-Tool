@@ -233,8 +233,7 @@ def test_search():
         results = query(search_term)
         html_results = markdown.markdown(results)
         results = Markup(html_results)
-        print(results)
-        return render_template('test_results.html', results=results)
+        return render_template('test_results.html', results=results, search_term=search_term)
 
 # Retrieve and display user-specific lists
 @app.route("/list", methods=["GET"])
