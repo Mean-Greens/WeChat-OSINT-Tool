@@ -38,6 +38,11 @@ cd Tool
 
 Navigate to the LangFlask directory and install the required packages. For this consider using a [python virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) so that packages on your system do not conflict with the packages that are needed to run this tool.
 
+Note: Before installing requirements.txt if you are using Windows, for this project you need Python >= 3.13 and Microsoft Visual C++ 14.0 or greater is required on Windows machines. Get it with [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). You will also need to keep uvloop commented out in the requirements.txt file. It is not compatible with Windows, however, it is compatible with Linux and MacOS.
+
+For any operating system, once the requirements are installed, you will need to `pip uninstall numpy`, and then `pip install numpy` to get a version greater than numpy 2.0. You may get error messages of incompatibility with langchain-chroma, but it works and numpy > 2.0 is required for other dependencies.
+
+
 ```shell
 cd ./LangFlask
 pip install -r requirements.txt
@@ -49,7 +54,7 @@ Before we can start our application we need to set up [Ollama](https://ollama.co
 
 ![verify ollama](image.png)
 
-We the need to pull down the image(s) that wee need to run. The first one is a small model that is used for vector embeddings in the datastore.
+We the need to pull down the image(s) that we need to run. The first one is a small model that is used for vector embeddings in the datastore.
 
 ```shell
 ollama pull mxbai-embed-large
