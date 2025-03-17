@@ -7,14 +7,14 @@ To download and run this tool, follow these steps:
 This section provides instructions for downloading and installing PostgreSQL on your machine.
 
 For Windows:
-1. Visit the official PostgreSQL download page for [Windows](https://www.postgresql.org/download/windows/)
+1. Visit the official PostgreSQL download page for [<u>Windows</u>](https://www.postgresql.org/download/windows/)
 2. Click on the "Download the installer" link to download the PostgreSQL installer.
 3. Run the downloaded installer and follow the on-screen instructions to complete the installation.
 4. During the installation process, you will be prompted to set a password for the PostgreSQL superuser (postgres). Make sure to remember this password as you will need it later.
 5. Once the installation is complete, you can verify the installation by opening the SQL Shell (psql) and connecting to the PostgreSQL server using the superuser credentials.
 
 For Linux (Ubuntu):
-1. Visit the official PostgreSQL download page for [Linux](https://www.postgresql.org/download/linux/ubuntu/)
+1. Visit the official PostgreSQL download page for [<u>Linux</u>](https://www.postgresql.org/download/linux/ubuntu/)
 2. Follow the instructions on the page to add the PostgreSQL APT repository to your system.
 3. Update the package lists on your system by running the command: `sudo apt-get update`.
 4. Install PostgreSQL by running the command: `sudo apt-get install postgresql postgresql-contrib`.
