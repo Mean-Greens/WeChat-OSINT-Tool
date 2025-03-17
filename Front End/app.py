@@ -230,6 +230,8 @@ def test_search():
     #once they search
     elif request.method == "POST":
         search_term = request.form['search_term']
+        if not search_term:
+            return render_template('test.html')
         results = query(search_term)
         html_results = markdown.markdown(results)
         results = Markup(html_results)
