@@ -23,6 +23,7 @@ from rich.traceback import install
 from pathlib import Path
 from collections import OrderedDict
 from constants import set_shared_variable, get_shared_variable, initialize_file
+from itertools import cycle
 
 # From rich.traceback this shows errors in a cleaner more readable way
 install(show_locals=False)
@@ -41,7 +42,8 @@ logging.basicConfig(
 pip install httpx beautifulsoup4 ollama chromadb
 '''
 
-HEADERS = {
+HEADERS_PROFILES = [
+        {
             'Host': 'weixin.sogou.com',
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -55,7 +57,85 @@ HEADERS = {
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'same-site',
             'Priority': 'u=0, i'
+        },
+        {
+            'Host': 'weixin.sogou.com',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Referer': 'https://www.sogou.com/',
+            'DNT': '1',
+            'Sec-GPC': '1',
+            'Connection': 'keep-alive',
+            'Cookie': 'IPLOC=DE; SUID=3C3E289559A5A20B0000000067D830C4; cuid=AAHHbxxbUgAAAAuipsjfKQIAvgU=; SUV=1742221510651291; ABTEST=8|1742221521|v1; SNUID=7B796FD2474E77CDC9A9A927486804BE',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-site',
+            'Priority': 'u=0, i'
+        },
+        {
+            'Host': 'weixin.sogou.com',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'DNT': '1',
+            'Sec-GPC': '1',
+            'Connection': 'keep-alive',
+            'Cookie': 'ABTEST=4|1742221680|v1; SUID=3C3E28957452A20B0000000067D83170; IPLOC=DE; SUID=3C3E289559A5A20B0000000067D83171',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Priority': 'u=0, i'
+        },
+        {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Cache-Control': 'max-age=0',
+            'Connection': 'keep-alive',
+            'Cookie': 'ABTEST=8|1742221814|v1; SUID=3C3E28957452A20B0000000067D831F6; IPLOC=DE; SUID=3C3E289559A5A20B0000000067D831F8',
+            'DNT': '1',
+            'Host': 'weixin.sogou.com',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+            'sec-ch-ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"'
+        },
+        {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Cache-Control": "max-age=0",
+            "Connection": "keep-alive",
+            "Cookie": "ABTEST=7|1742221953|v1; SUID=3C3E28957452A20B0000000067D83281; IPLOC=DE; SUID=3C3E289559A5A20B0000000067D83282; SNUID=C0C2D469FBFACC7152FB12BBFC4FF696; ariaDefaultTheme=undefined; SUV=00A649ED95283E3C67D8328BB2D23006",
+            "Host": "weixin.sogou.com",
+            "Referer": "https://weixin.sogou.com/",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "same-origin",
+            "Sec-Fetch-User": "?1",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0",
+            "sec-ch-ua": '"Chromium";v="134", "Not:A-Brand";v="24", "Microsoft Edge";v="134"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"'
         }
+    ]
+
+# Create an infinite iterator
+iterator = cycle(HEADERS_PROFILES)
+
+HEADERS = next(iterator)
 
 
 BASE_URL_1 = 'https://weixin.sogou.com/weixin?type=2&s_from=input&query=' # query in chinese
@@ -219,6 +299,8 @@ def get_wechat_link(url):
         else:
             print("Failed to retrieve WeChat link.")
     """
+    global HEADERS
+
     with httpx.Client(timeout=httpx.Timeout(60.0)) as client:
         
         response = client.get(url, headers=HEADERS)
@@ -227,6 +309,10 @@ def get_wechat_link(url):
             print("You have been blocked")
             logging.error(response.headers)
             logging.error("You have been blocked")
+
+            # If we have been blocked change out the header profile
+            HEADERS = next(iterator)
+
             return None
         elif response.status_code == 200:
             WCUrl = ""
