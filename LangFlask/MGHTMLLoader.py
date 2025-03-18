@@ -15,7 +15,7 @@ from langchain_community.document_loaders.base import BaseLoader
 # Add parent directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from Demo import *
+from scraper import *
 import json
 
 logger = logging.getLogger(__name__)
