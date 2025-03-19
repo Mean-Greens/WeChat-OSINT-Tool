@@ -257,7 +257,7 @@ def retrieve_lists():
 # Render documentation from a markdown file
 @app.route("/doc")
 def doc():
-    md_content = read_markdown_file(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "README.md"))
+    md_content = read_markdown_file(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "HOWTOUSE.md"))
     html_content = markdown.markdown(md_content)
     content = Markup(html_content)
     return render_template("doc.html", content=content)
