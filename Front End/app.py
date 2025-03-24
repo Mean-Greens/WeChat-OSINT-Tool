@@ -12,6 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from LangFlask.query import query, query_translation
 from LangFlask.constants import set_shared_variable, get_shared_variable
+from LangFlask.get_vector_db import get_vector_db, get_chunked_db
 
 load_dotenv()
 
@@ -19,6 +20,17 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET")
 #csrf = CSRFProtect(app)
 
+# Define and register the custom filter
+def get_type(value):
+    return str(type(value))
+
+app.jinja_env.filters['type'] = get_type
+
+# Define and register the custom filter
+def get_length(value):
+    return str(len(value))
+
+app.jinja_env.filters['length'] = get_length
 
 # ------------------------ Database connection stuff, but no dastabse so commented out to limit bugs for now ------------------------ #
 
@@ -184,8 +196,19 @@ def test_wordlist():
 @app.route("/articles", methods=['GET'])
 def articles():
     if request.method == "GET":
+        db = get_vector_db()
         files = os.listdir(Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/')))
-        return render_template("articles.html", files=files)
+        files_titles = []
+        for file in files:
+            metadatas = db.get(where={"hash": file[:-5]}).get('metadatas')
+            if not metadatas:
+                files_titles.append(file)
+            else:
+                for i in metadatas:
+                    files_titles.append(i.get('title'))
+
+        files_length = len(files)
+        return render_template("articles.html", files=files, files_titles=files_titles, files_length=files_length)
 
 # Serve an article file from the Articles directory
 @app.route("/articles/<path:filename>")
