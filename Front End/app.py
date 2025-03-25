@@ -97,6 +97,11 @@ def document_exists_by_term(vectorstore, keyword):
     results = vectorstore.get(where={"keyword": keyword})  # Direct metadata lookup
     return results["documents"]  # Returns the documents that exist
 
+# checks to see if a document is in the VectorDB with the following keyword from the wordlist
+def document_metadata_by_term(vectorstore, keyword):
+    results = vectorstore.get(where={"keyword": keyword})  # Direct metadata lookup
+    return results  # Returns the documents that exist
+
 # Add a word to the file
 def add_word(new_word):
     with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "LangFlask/Wordlist.txt"), "a", encoding="utf-8") as file:
@@ -199,7 +204,8 @@ def test_wordlist():
         for i in range(0, len(words) - 1):
             documents = document_exists_by_term(db, chinese_words[i])
             combined_list.append(f'{words[i]}, {chinese_words[i]} ({len(documents)} articles available)')
-        return render_template("test_wordlist.html", words=combined_list)
+        length_words = len(combined_list)
+        return render_template("test_wordlist.html", words=combined_list, chinese_words=chinese_words, length_words=length_words)
     elif request.method == "POST":
         new_word = request.form.get("new_word", "").strip()
         if new_word:  # Only add non-empty words
@@ -222,6 +228,31 @@ def articles():
                     files_titles.append(i.get('title'))
 
         files_length = len(files)
+        return render_template("articles.html", files=files, files_titles=files_titles, files_length=files_length)
+
+# Display a list of article files
+@app.route("/articles_by_term/<path:keyword>", methods=['GET'])
+def articles_by_term(keyword):
+    if request.method == "GET":
+        db = get_vector_db()
+        files = os.listdir(Path(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), f'Articles/')))
+        files_titles = []
+        term_files = document_metadata_by_term(db, keyword)
+
+        term_files_metadatas = term_files.get('metadatas')
+        hashes = []
+        for term_file_metadata in term_files_metadatas:
+            hashes.append(term_file_metadata.get('hash'))
+
+        for file in hashes:
+            metadatas = db.get(where={"hash": file}).get('metadatas')
+            if not metadatas:
+                files_titles.append(file)
+            else:
+                for i in metadatas:
+                    files_titles.append(i.get('title'))
+
+        files_length = len(files_titles)
         return render_template("articles.html", files=files, files_titles=files_titles, files_length=files_length)
 
 # Serve an article file from the Articles directory

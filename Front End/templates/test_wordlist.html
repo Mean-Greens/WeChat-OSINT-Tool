@@ -27,9 +27,9 @@
     </form>
     <div class="space-y-2">
         {% if words %}
-            {% for item in words %}
+            {% for i in range(length_words) %}
                 <div class="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-md">
-                    <span class="text-gray-700">{{ item }}</span>
+                    <span class="text-gray-700"><a href="{{ url_for('articles_by_term', keyword=chinese_words[i]) }}" style="text-decoration: underline;">{{ words[i] }}</a></span>
                     <button class="text-gray-400 hover:text-red-500 focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

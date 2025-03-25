@@ -6,7 +6,7 @@
 <div class="bg-white rounded-lg shadow-lg p-6">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Articles</h1>
     <div class="space-y-2">
-        {% if files %}
+        {% if files_length > 0 %}
             {% for i in range(files_length) %}
                 <div class="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-md">
                     <span class="text-gray-700"><a href="{{ url_for('serve_article', filename=files[i]) }}" style="text-decoration: underline;">{{ files_titles[i] }}</a></span>
