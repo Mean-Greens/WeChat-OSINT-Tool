@@ -84,9 +84,18 @@ def index():
 # Load words from the file (maintain original order)
 def load_words():
     with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "LangFlask/Wordlist.txt"), "r", encoding="utf-8") as file:  # Use UTF-8 encoding for non-English characters
-        words = file.read().splitlines()
-        chinese_search_terms = file.read().splitlines()[1::2]
-    return words
+        search_terms = file.readlines()
+        for i, term in enumerate(search_terms):
+            search_terms[i] = term.strip()
+        search_terms = list(filter(None, search_terms))
+        words = search_terms[::2]
+        chinese_search_terms = search_terms[1::2]
+    return [words, chinese_search_terms]
+
+# checks to see if a document is in the VectorDB with the following keyword from the wordlist
+def document_exists_by_term(vectorstore, keyword):
+    results = vectorstore.get(where={"keyword": keyword})  # Direct metadata lookup
+    return results["documents"]  # Returns the documents that exist
 
 # Add a word to the file
 def add_word(new_word):
@@ -135,6 +144,8 @@ def get_words_in_list(id):
     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
     return result
 
+db = get_vector_db()
+
 # ------------------------ BEGIN ROUTES ------------------------ #
 # @app.route("/")
 # def home():
@@ -181,10 +192,13 @@ def test_wordlist():
 
     """
     if request.method == "GET":
-        words = load_words()
+        words_full = load_words()
+        words = words_full[0]
+        chinese_words = words_full[1]
         combined_list = []
-        for i in range(0, len(words) - 1, 2):
-            combined_list.append(words[i] + ', ' + words[i + 1])
+        for i in range(0, len(words) - 1):
+            documents = document_exists_by_term(db, chinese_words[i])
+            combined_list.append(f'{words[i]}, {chinese_words[i]} ({len(documents)} articles available)')
         return render_template("test_wordlist.html", words=combined_list)
     elif request.method == "POST":
         new_word = request.form.get("new_word", "").strip()
