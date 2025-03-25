@@ -34,6 +34,34 @@ git clone https://github.com/Mean-Greens/Tool.git
 cd Tool
 ```
 
+### Create .env files:
+
+Create one .env file in the LangFlask folder with the following format:
+
+```
+TEMP_FOLDER = './_temp'
+CHROMA_PATH = './chroma'
+COLLECTION_NAME = 'Wechat'
+COLLECTION_CHUNKED_NAME = 'Chunked'
+LLM_MODEL = 'aya-expanse:32b'
+TEXT_EMBEDDING_MODEL = 'shaw/dmeta-embedding-zh'
+
+```
+
+Create another .env file in the Front End folder with the following format:
+
+```
+DB_HOST="localhost"
+DB_USER="postgres"
+DB_PASSWORD="<password>"
+DB_DATABASE="wechat"
+SECRET="<secret>"
+```
+
+The variables within the LangFlask .env file can be changed if you desire to try different Large Language models or vector embedding models.
+
+The variables of the Front End .env file will need to be updated to contain a valid postgres password and secret.
+
 ### Install the requirements:
 
 Navigate to the LangFlask directory and install the required packages. For this consider using a [python virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) so that packages on your system do not conflict with the packages that are needed to run this tool.
