@@ -533,7 +533,7 @@ def document_exists_by_hash(vectorstore, hash_value):
     results = vectorstore.get(where={"hash": hash_value})  # Direct metadata lookup
     return bool(results["documents"])  # Check if any documents exist
 
-#Main function to make everything run
+# Main function to make everything run
 @timer
 def main(search_term):
     documents = sogou_searcher(search_term)
