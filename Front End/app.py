@@ -201,7 +201,7 @@ def test_wordlist():
         words = words_full[0]
         chinese_words = words_full[1]
         combined_list = []
-        for i in range(0, len(words) - 1):
+        for i in range(len(words)):
             documents = document_exists_by_term(db, chinese_words[i])
             combined_list.append(f'{words[i]}, {chinese_words[i]} ({len(documents)} articles available)')
         length_words = len(combined_list)
