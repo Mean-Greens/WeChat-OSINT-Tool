@@ -16,11 +16,11 @@ Below are a set of simple instructions to use each page on this tool.
 
 This page contains the main functionality of the tool and is where the user interacts directly with the LLM. The LLM in this program is not a chat bot and has no memory of previous prompts. Because of this, each response is unique and does not reference any previous conversation. 
 
-In the response the LLM will give the user, the top 5 most revelvant artciles will be displayed for the user's reference. The user can click on the provided hash of the article to see the webpage the article referenced (Many of these pages are in Chinese, but the user is welcome to view them if they like).
+In the response the LLM will give the user, the top 5 most revelvant artciles will be displayed for the user's reference. The user can click on the provided title of the article to see the webpage the article referenced (Many of these pages are in Chinese, but the user is welcome to view them if they like, most browsers can translate them with some varying degree of accuracy).
 
 ### Word List
 
-This is where the user imputs words to influence the topics the LLM can reference. The user can add or subtract words from this list as they wish. The scraper will search for every word in this list every 15 to 25 minutes for new relevant articles. Duplicates should not be stored. 
+This is where the user imputs words to influence the topics the LLM can reference. The user can add or subtract words from this list as they wish. The scraper will search for every word in this list every 15 to 25 minutes for new relevant articles. Duplicates should not be stored. Beside every word there is a a count of how many articles are in the database are related to that article (Note: this shows the articles that were scraped from wechat with that word, not necessarily purely what words are related to the article). By clicking on the word you can also see the articles just related to that word.
 
 ### Articles
 
