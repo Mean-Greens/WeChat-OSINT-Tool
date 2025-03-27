@@ -141,10 +141,10 @@ def query(input):
         def print_docs(docs):
             global sources
             for doc in docs:
-                sources += ("Article Title: " + doc.metadata.get('title') + "\n")
+                sources += ("Article Title: <a href=\"articles/" + doc.metadata.get('hash') +".html\" style=\"text-decoration: underline;\">" + doc.metadata.get('title') + "</a>\n")
                 sources += ("   Author: " + doc.metadata.get('author') + "\n")
                 sources += ("   Date: " + timeConvert(doc.metadata.get('date')) + "\n")
-                sources += ("   Hash: <a href=\"articles/" + doc.metadata.get('hash') +".html\">" + doc.metadata.get('hash') + "</a>\n\n")
+                sources += ("   Hash: " + doc.metadata.get('hash') + "\n\n")
             return docs
 
         # context_docs = output.invoke(input)
